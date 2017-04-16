@@ -1,0 +1,25 @@
+{
+  "name": "sorrow-bot",
+  "version": "1.0.0",
+  "description": "Obscure Sorrow Bot: A Discord Bot",
+  "dependencies": {},
+  "main": "obscure.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lazaryo/sorrow-bot.git"
+  },
+  "keywords": [
+    "discord-js",
+    "discord-bot"
+  ],
+  "author": "Malik Hemphill",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lazaryo/sorrow-bot/issues"
+  },
+  "homepage": "https://github.com/lazaryo/sorrow-bot#readme"
+}
