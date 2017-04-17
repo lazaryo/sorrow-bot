@@ -1,6 +1,6 @@
-exports.run = (bot, message, args, owner, sorrows, rn, about, prefix, displayWords, checkWord, singleWord) => {
-    const wordCount = message.content.split(" ").length;
-    const words = message.content.split(" ");
+exports.run = (bot, message, args, about, prefix, rn, sorrows, displayWords, checkWord, singleWord) => {
+    const wordCount = message.content.split("word ").length;
+    const words = message.content.split("word ");
     var w = '';
     
     words.shift();
@@ -17,7 +17,7 @@ exports.run = (bot, message, args, owner, sorrows, rn, about, prefix, displayWor
     }
     
     if(checkWord(sorrows, w) == false) {
-        return message.reply(`\`${w}\` is not a valid word. Use the command \`dictionary\` for a complete list of words.`)
+        return message.channel.sendMessage(`\`${w}\` is not a valid word. Use the command \`dictionary\` for a complete list of words.`)
     } else {
         let sw = singleWord(sorrows, w);
         w = w.toLowerCase();

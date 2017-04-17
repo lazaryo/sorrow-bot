@@ -7,9 +7,8 @@ const config = require('./config.json');
 
 const sorrows = require('./words.json');
 
-const prefix = config.prefix;
 const about = config.about;
-const owner = config.ownerID;
+const prefix = `<@!${about.botID}>`;
 
 // use require() for future references
 bot.on('ready', () => {
@@ -17,24 +16,27 @@ bot.on('ready', () => {
 });
 
 bot.on("message", (message) => {
+    if (message.author.id == about.ownerID) return;
     if (message.author.bot) return;
     if (!message.content.startsWith(prefix)) return;
     
-    let command = message.content.split(" ")[0];
-    command = command.slice(prefix.length);
+    let command = message.content.split(" ")[1];
 
     var rn = Math.floor(Math.random() * (sorrows.length - 1));
     
-    let args = message.content.split(" ").slice(1);
+    let args = message.content.split(" ").slice(2);
     
     var path = './commands/';
     
+    if (command == '' || command == null) {
+        command = 'null';
+    }
+    
     try {
         let commandFile = require(`${path}${command}.js`);
-        commandFile.run(bot, message, args, owner, sorrows, rn, about, prefix, displayWords, checkWord, singleWord);
+        commandFile.run(bot, message, args, about, rn, sorrows, displayWords, checkWord, singleWord, prefix);
     } catch (err) {
         // if the command is invalid
-        message.reply(`\`${command}\` is not a valid command. Check \`!help\` for a list of commands.`);
         console.error(err);
     }
 });
