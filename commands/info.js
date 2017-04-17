@@ -10,7 +10,7 @@ exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, 
             },
             {
                 name: 'Owner',
-                value: `${about.owner} (${about.ownerID})`
+                value: `${about.owner}`
             },
             {
                 name: 'Library',

@@ -1,4 +1,4 @@
-exports.run = (bot, message, args, about, prefix, rn, sorrows, displayWords, checkWord, singleWord) => {
+exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, singleWord, prefix) => {
     const wordCount = message.content.split(` `).length;
     let words = message.content.split(` `);
     var w = '';
@@ -17,7 +17,6 @@ exports.run = (bot, message, args, about, prefix, rn, sorrows, displayWords, che
     if (w == '' || w == null) {
         w = 'null';
     }
-    console.log(w);
     
     if(checkWord(sorrows, w) == false) {
         return message.channel.sendMessage(`\`${w}\` is not a valid word. Use the command \`dictionary\` for a complete list of words.`)

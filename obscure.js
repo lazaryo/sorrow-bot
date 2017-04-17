@@ -8,7 +8,7 @@ const config = require('./config.json');
 const sorrows = require('./words.json');
 
 const about = config.about;
-const prefix = `<@!${about.botID}>`;
+const prefix = '<@!299851881746923520>'
 
 // use require() for future references
 bot.on('ready', () => {
@@ -69,7 +69,6 @@ function singleWord(sorrows, w) {
     var l = '';
 
     for (let sorrow of sorrows) {
-        console.log(sorrow);
         w = w.toUpperCase();
         l = sorrow.title.toUpperCase();
 
