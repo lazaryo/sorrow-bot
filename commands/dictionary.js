@@ -1,4 +1,4 @@
-exports.run = (bot, message, args, about, prefix, rn, sorrows, displayWords, checkWord, singleWord) => {
+exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, singleWord, prefix) => {
     message.channel.sendEmbed({
         color: 0x23BDE7,
         title: 'Dictionary',

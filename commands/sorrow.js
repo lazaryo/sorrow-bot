@@ -1,4 +1,4 @@
-exports.run = (bot, message, args, about, prefix, rn, sorrows) => {
+exports.run = (bot, message, args, about, rn, sorrows) => {
     message.channel.sendEmbed({
         color: 0x23BDE7,
         title: `${sorrows[rn].title} - ${sorrows[rn].speech}`,

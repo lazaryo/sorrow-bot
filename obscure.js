@@ -28,10 +28,6 @@ bot.on("message", (message) => {
     
     var path = './commands/';
     
-    if (command == '' || command == null) {
-        command = 'null';
-    }
-    
     try {
         let commandFile = require(`${path}${command}.js`);
         commandFile.run(bot, message, args, about, rn, sorrows, displayWords, checkWord, singleWord, prefix);
@@ -72,7 +68,8 @@ function singleWord(sorrows, w) {
     var word = w;
     var l = '';
 
-    for (const sorrow of sorrows) {
+    for (let sorrow of sorrows) {
+        console.log(sorrow);
         w = w.toUpperCase();
         l = sorrow.title.toUpperCase();
 

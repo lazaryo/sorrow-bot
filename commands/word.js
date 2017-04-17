@@ -1,10 +1,12 @@
 exports.run = (bot, message, args, about, prefix, rn, sorrows, displayWords, checkWord, singleWord) => {
-    const wordCount = message.content.split("word ").length;
-    const words = message.content.split("word ");
+    const wordCount = message.content.split(` `).length;
+    let words = message.content.split(` `);
     var w = '';
-    
+        
     words.shift();
-    words.forEach(function(item, index, array) {
+    words.shift();
+        
+    words.forEach(function(item, index) {
         if (index == (words.length - 1)) {
             w += `${item}`
         } else {
@@ -15,6 +17,7 @@ exports.run = (bot, message, args, about, prefix, rn, sorrows, displayWords, che
     if (w == '' || w == null) {
         w = 'null';
     }
+    console.log(w);
     
     if(checkWord(sorrows, w) == false) {
         return message.channel.sendMessage(`\`${w}\` is not a valid word. Use the command \`dictionary\` for a complete list of words.`)

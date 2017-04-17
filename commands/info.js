@@ -1,4 +1,4 @@
-exports.run = (bot, message, args, about, prefix, rn, sorrows, displayWords, checkWord, singleWord) => {
+exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, singleWord, prefix) => {
     message.channel.sendEmbed({
         color: 0x23BDE7,
         title: 'Obscure Sorrows',
@@ -15,10 +15,6 @@ exports.run = (bot, message, args, about, prefix, rn, sorrows, displayWords, che
             {
                 name: 'Library',
                 value: '[Discord.js](https://discord.js.org/)'
-            },
-            {
-                name: 'Home Server',
-                value: '[Join](https://discord.gg/VT73vPh)'
             },
             {
                 name: 'Invite',
@@ -40,11 +36,6 @@ exports.run = (bot, message, args, about, prefix, rn, sorrows, displayWords, che
                 name: 'Lastest Guild',
                 value: `\`${bot.guilds.first()}\``
             }
-//            ,
-//            {
-//                name: 'Uptime',
-//                value: `\`${bot.uptime}\``
-//            }
         ],
         timestamp: new Date(),
         footer: {
