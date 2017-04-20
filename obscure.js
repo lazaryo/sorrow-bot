@@ -1,6 +1,5 @@
 'use strict';
 
-const fs = require("fs");
 const Discord = require("discord.js");
 const bot = new Discord.Client();
 const config = require('./config.json');
@@ -8,11 +7,14 @@ const config = require('./config.json');
 const sorrows = require('./words.json');
 
 const about = config.about;
-const prefix = '<@!299851881746923520>'
+const prefix = '<@299851881746923520>';
+
+// My Guild ID: 299853081578045440
+// Bot ID: 299853081578045440
 
 // use require() for future references
 bot.on('ready', () => {
-    console.log(`Ready to server in ${bot.channels.size} channels on ${bot.guilds.size} servers, for a total of ${bot.users.size} users.`);
+    console.log(`Ready to serve in ${bot.channels.size} channels on ${bot.guilds.size} servers, for a total of ${bot.users.size} users.`);
 });
 
 bot.on("message", (message) => {
@@ -31,9 +33,14 @@ bot.on("message", (message) => {
     try {
         let commandFile = require(`${path}${command}.js`);
         commandFile.run(bot, message, args, about, rn, sorrows, displayWords, checkWord, singleWord, prefix);
+        console.log(bot.user);
     } catch (err) {
         // if the command is invalid
         console.error(err);
+        console.log(bot.user);
+        console.log(`From Guild: ${message.guild.name}`);
+        console.log(`Author Username: ${message.author.username}`);
+        console.log(`Author ID: ${message.author.id}`);
     }
 });
 
