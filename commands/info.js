@@ -1,4 +1,4 @@
-exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, singleWord, prefix) => {
+exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, singleWord, prefix, botUptime) => {
     message.channel.sendEmbed({
         color: 0x23BDE7,
         title: 'Obscure Sorrows',
@@ -33,8 +33,8 @@ exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, 
                 value: `\`${bot.users.size}\``
             },
             {
-                name: 'Lastest Guild',
-                value: `\`${bot.guilds.first()}\``
+                name: 'Uptime',
+                value: `\`${botUptime(bot.uptime)}\``
             }
         ],
         timestamp: new Date(),

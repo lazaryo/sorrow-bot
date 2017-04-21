@@ -2,7 +2,9 @@
   "name": "sorrow-bot",
   "version": "1.0.0",
   "description": "Obscure Sorrow Bot: A Discord Bot",
-  "dependencies": {},
+  "dependencies": {
+    "jsonfile": "^2.4.0"
+  },
   "main": "obscure.js",
   "devDependencies": {},
   "scripts": {
