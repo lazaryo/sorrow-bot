@@ -1,6 +1,6 @@
 'use strict';
 
-const fs = require("fs");
+//const fs = require("fs");
 const Discord = require("discord.js");
 const bot = new Discord.Client();
 const config = require('./config.json');
@@ -9,18 +9,28 @@ const sorrows = require('./words.json');
 const about = config.about;
 const prefix = '<@299851881746923520>';
 
-// My Guild ID: 299853081578045440
-// Bot ID: 299853081578045440
-
 // use require() for future references
 bot.on('ready', () => {
     console.log(`Ready to serve in ${bot.channels.size} channels on ${bot.guilds.size} servers, for a total of ${bot.users.size} users.`);
 });
 
+// response when messages are sent in a channel
 bot.on("message", (message) => {
     if (message.author.id == about.ownerID) return;
     if (message.author.bot) return;
     if (!message.content.startsWith(prefix)) return;
+    
+    var botCount = message.guild.members.filter(m => m.user.bot).size;
+    var humanCount = message.guild.members.filter(m => !m.user.bot).size;
+    var server = message.guild;
+    
+    if(botCount > humanCount) {
+        message.channel.sendMessage('I can\'t stay here.');
+        server.leave();
+        console.log(`Bots: ${botCount}`);
+        console.log(`Humans: ${humanCount}`);
+        return console.log(`I left the server: ${server.name} because there are too many bots.`);
+    }
     
     let command = message.content.split(" ")[1];
 
@@ -35,31 +45,58 @@ bot.on("message", (message) => {
         commandFile.run(bot, message, args, about, rn, sorrows, displayWords, checkWord, singleWord, prefix, botUptime);
     } catch (err) {
         // if the command is invalid
-        // console.error(err);
+        console.error(err);
         console.log(`From Guild: ${message.guild.name}`);
         console.log(`Author Username: ${message.author.username}`);
         console.log(`Author ID: ${message.author.id}`);
     }
 });
 
+// When the bot joins a new server
+bot.on("guildCreate", server => {
+    let serverOwner = server.owner;
+    serverOwner.sendMessage('Thanks for adding me. Below are the commands that you can use with me.');
+    serverOwner.sendEmbed({
+        color: 0x23BDE7,
+        title: 'My Commands',
+        description: '`sorrow`, `word`, `dictionary`, `info`, `help`',
+        fields: [{
+            name: 'Prefix',
+            value: `${bot.user}`
+        }]
+    });
+    
+    var botCount = server.members.filter(m => m.user.bot).size;
+    var humanCount = server.members.filter(m => !m.user.bot).size;
+    
+    if(botCount > humanCount) {
+        serverOwner.sendMessage('I can\'t stay here.');
+        server.leave();
+        console.log(`I left the server: ${server.name} because there are too many bots.`);
+    }
+});
+
+// Error stuff
 bot.on('error', (e) => console.error(e));
 bot.on('warn', (e) => console.warn(e));
 
+// Bot logging online
 bot.login(config.token);
 
-bot.setInterval(function(){getStats(bot)}, 60000);
-//bot.setInterval(function(){getStats(bot)}, 3600000);
+// Display Stats every hour
+bot.setInterval(function() {
+    getStats(bot)
+}, 3600000);
 
+// Logging the Stats function
 function getStats(bot) {
     console.log('Guilds: ' + bot.guilds.size);
     console.log('Channels: ' + bot.channels.size);
     console.log('Users: ' + bot.users.size);
 }
 
+// translating bot uptime
 function botUptime(milliseconds) {
-    // TIP: to find current time in milliseconds, use:
-    // var  current_time_milliseconds = new Date().getTime();
-
     function numberEnding (number) {
         return (number > 1) ? 's' : '';
     }

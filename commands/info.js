@@ -10,31 +10,38 @@ exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, 
             },
             {
                 name: 'Owner',
-                value: `${about.owner}`
+                value: about.owner,
+                inline: true
             },
             {
                 name: 'Library',
-                value: '[Discord.js](https://discord.js.org/)'
+                value: '[Discord.js](https://discord.js.org/)',
+                inline: true
             },
             {
                 name: 'Invite',
-                value: '[Link](https://discordapp.com/oauth2/authorize?client_id=299851881746923520&scope=bot&permissions=31744)'
+                value: '[Link](https://discordapp.com/oauth2/authorize?client_id=299851881746923520&scope=bot&permissions=31744)',
+                inline: true
             },
             {
                 name: 'Servers',
-                value: `\`${bot.guilds.size}\``
+                value: bot.guilds.size,
+                inline: true
             },
             {
                 name: 'Channels',
-                value: `\`${bot.channels.size}\``
+                value: bot.channels.size,
+                inline: true
             },
             {
                 name: 'Users',
-                value: `\`${bot.users.size}\``
+                value: bot.users.size,
+                inline: true
             },
             {
                 name: 'Uptime',
-                value: `\`${botUptime(bot.uptime)}\``
+                value: botUptime(bot.uptime),
+                inline: true
             }
         ],
         timestamp: new Date(),
