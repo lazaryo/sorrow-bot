@@ -6,11 +6,27 @@ exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, 
         fields: [
             {
                 name: 'The Bot',
-                value: about.bot
+                value: about.bot,
+                inline: false
             },
             {
                 name: 'Owner',
                 value: about.owner,
+                inline: true
+            },
+            {
+                name: 'Links',
+                value: 'Author: [John Koenig](https://twitter.com/ObscureSorrows/)\n[Dictionary Website](http://dictionaryofobscuresorrows.com)',
+                inline: true
+            },
+            {
+                name: 'Videos',
+                value: '[Introduction to Series](https://www.youtube.com/watch?v=hEDWHQr2Wjw)\n[Series Announcement](https://vimeo.com/97890190)',
+                inline: true
+            },
+            {
+                name: 'Uptime',
+                value: botUptime(bot.uptime),
                 inline: true
             },
             {
@@ -36,11 +52,6 @@ exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, 
             {
                 name: 'Users',
                 value: bot.users.size,
-                inline: true
-            },
-            {
-                name: 'Uptime',
-                value: botUptime(bot.uptime),
                 inline: true
             }
         ],

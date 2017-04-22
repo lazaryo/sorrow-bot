@@ -18,7 +18,34 @@ bot.on('ready', () => {
 bot.on("message", (message) => {
     if (message.author.id == about.ownerID) return;
     if (message.author.bot) return;
+    
+    if (message.channel.type == 'dm') {
+        message.author.sendMessage('I don\'t work within Direct Messages. Use one of the commands below within a text channel.');
+        return message.author.sendEmbed({
+            color: 0x23BDE7,
+            title: 'My Commands',
+            description: '`sorrow`, `word`, `dictionary`, `info`, `help`',
+            fields: [{
+                name: 'Prefix',
+                value: `${bot.user}`
+            }]
+        }).catch(error => console.log(error));
+    };
+    
     if (!message.content.startsWith(prefix)) return;
+
+    if (message.channel.type !== 'text') {
+        message.author.sendMessage('I don\'t work within Direct Messages. Use one of the commands below within a text channel.');
+        return message.author.sendEmbed({
+            color: 0x23BDE7,
+            title: 'My Commands',
+            description: '`sorrow`, `word`, `dictionary`, `info`, `help`',
+            fields: [{
+                name: 'Prefix',
+                value: `${bot.user}`
+            }]
+        }).catch(error => console.log(error));
+    };
     
     var botCount = message.guild.members.filter(m => m.user.bot).size;
     var humanCount = message.guild.members.filter(m => !m.user.bot).size;
