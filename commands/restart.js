@@ -2,9 +2,6 @@ exports.run = (bot, message, args, about) => {
     if (message.author.id !== "303105492572569600") {
         return message.channel.sendMessage('You don\'t have permission you :chicken:!');
     }
-    function b(value, key, map) {
-        console.log(key.guild.name);
-    }
     
     function guildList() {
         for (let n of bot.guilds) {

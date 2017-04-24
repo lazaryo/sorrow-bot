@@ -1,6 +1,5 @@
 'use strict';
 
-//const fs = require("fs");
 const Discord = require("discord.js");
 const bot = new Discord.Client();
 const config = require('./config.json');
@@ -81,9 +80,9 @@ bot.on("message", (message) => {
 
 // When the bot joins a new server
 bot.on("guildCreate", server => {
-    let serverOwner = server.owner;
-    serverOwner.sendMessage('Thanks for adding me. Below are the commands that you can use with me.');
-    serverOwner.sendEmbed({
+    // Welcome message with a list of commands will be sent to the default channel when joining the guild
+    server.defaultChannel.sendMessage('Thanks for adding me. Below are the commands that you can use with me.');
+    server.defaultChannel.sendEmbed({
         color: 0x23BDE7,
         title: 'My Commands',
         description: '`sorrow`, `word`, `dictionary`, `info`, `help`',
@@ -91,7 +90,7 @@ bot.on("guildCreate", server => {
             name: 'Prefix',
             value: `${bot.user}`
         }]
-    });
+    }).catch(error => console.log(error));
     
     var botCount = server.members.filter(m => m.user.bot).size;
     var humanCount = server.members.filter(m => !m.user.bot).size;
