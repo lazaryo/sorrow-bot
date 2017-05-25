@@ -49,12 +49,15 @@ bot.on("message", (message) => {
     var botCount = message.guild.members.filter(m => m.user.bot).size;
     var humanCount = message.guild.members.filter(m => !m.user.bot).size;
     var server = message.guild;
+    var serverOwner = message.guild.owner.displayName;
+    var serverOwnerID = message.guild.owner.id;
     
-    if(botCount > humanCount) {
-        message.channel.sendMessage('I can\'t stay here.');
-        server.leave();
+    if (botCount > humanCount) {
+        console.log(`Guild Owner: ${serverOwner}`);
+        console.log(`Guild Owner ID: ${serverOwnerID}`);
         console.log(`Bots: ${botCount}`);
         console.log(`Humans: ${humanCount}`);
+        server.leave();
         return console.log(`I left the server: ${server.name} because there are too many bots.`);
     }
     
@@ -94,11 +97,13 @@ bot.on("guildCreate", server => {
     
     var botCount = server.members.filter(m => m.user.bot).size;
     var humanCount = server.members.filter(m => !m.user.bot).size;
+    var serverOwner = server.owner.displayName;
+    var serverOwnerID = server.owner.id;
     
-    if(botCount > humanCount) {
-        serverOwner.sendMessage('I can\'t stay here.');
-        server.leave();
+    if (botCount > humanCount) {
+        console.log(`Guild Owner: ${serverOwner}, Owner ID: ${serverOwnerID}.`);
         console.log(`I left the server: ${server.name} because there are too many bots.`);
+        server.leave();
     }
 });
 
