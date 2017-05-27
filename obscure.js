@@ -5,6 +5,7 @@ const bot = new Discord.Client();
 const config = require('./config.json');
 
 const sorrows = require('./words.json');
+const blacklist = require('./blacklist.json');
 const about = config.about;
 const prefix = '<@299851881746923520>';
 
@@ -71,7 +72,7 @@ bot.on("message", (message) => {
     
     try {
         let commandFile = require(`${path}${command}.js`);
-        commandFile.run(bot, message, args, about, rn, sorrows, displayWords, checkWord, singleWord, prefix, botUptime);
+        commandFile.run(bot, message, args, about, rn, sorrows, displayWords, checkWord, singleWord, prefix, botUptime, blacklist);
     } catch (err) {
         // if the command is invalid
         console.error(err);
@@ -99,8 +100,10 @@ bot.on("guildCreate", server => {
     var humanCount = server.members.filter(m => !m.user.bot).size;
     var serverOwner = server.owner.displayName;
     var serverOwnerID = server.owner.id;
+    var serverID = server.id;
     
     if (botCount > humanCount) {
+        console.log(`\n\nGuild ID: ${serverID}`);
         console.log(`Guild Owner: ${serverOwner}, Owner ID: ${serverOwnerID}.`);
         console.log(`I left the server: ${server.name} because there are too many bots.`);
         server.leave();

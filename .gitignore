@@ -4,6 +4,9 @@ config.json
 #words
 words.json
 
+#blacklist
+blacklist.json
+
 # Logs
 logs
 *.log
