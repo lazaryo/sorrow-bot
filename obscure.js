@@ -72,11 +72,13 @@ bot.on("message", (message) => {
     
     try {
         let commandFile = require(`${path}${command}.js`);
-        commandFile.run(bot, message, args, about, rn, sorrows, displayWords, checkWord, singleWord, prefix, botUptime, blacklist);
+        commandFile.run(bot, message, args, about, rn, sorrows, displayWords, checkWord, singleWord, prefix, botUptime, blacklist, checkID);
     } catch (err) {
         // if the command is invalid
         console.error(err);
-        console.log(`From Guild: ${message.guild.name}`);
+        console.log(`\n\nFrom Guild: ${message.guild.name}`);
+        console.log(`Guild ID: ${message.guild.id}`);
+        console.log(`Owner ID: ${message.guild.owner.id}\n`);
         console.log(`Author Username: ${message.author.username}`);
         console.log(`Author ID: ${message.author.id}`);
     }
@@ -157,6 +159,31 @@ function botUptime(milliseconds) {
         return seconds + ' second' + numberEnding(seconds);
     }
     return 'just now';
+}
+
+// check if a guild's id exist
+function checkID(id, bot) {
+    let servers = bot.guilds,
+        last = bot.guilds.size,
+        i = 1,
+        lastServerID;
+    
+    for (let lastServer of servers) {
+        if (i == last) {
+            lastServerID = lastServer[1].id;
+        }
+        i++;
+    }
+            
+    for (let server of servers) {
+        if( id == server[1].id) {
+            return true
+        }
+    }
+
+    if (lastServerID !== id) {
+        return false
+    }
 }
 
 // check if word submitted exists in the dictionary

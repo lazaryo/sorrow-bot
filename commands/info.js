@@ -62,29 +62,6 @@ exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, 
         }
     });
     
-    var parts = [
-        {
-            name: 'Guild Count',
-            value: bot.guilds.size,
-            inline: true
-        },
-        {
-            name: 'Current Guild',
-            value: message.guild.name,
-            inline: true
-        },
-        {
-            name: 'Current Guild Bot Count',
-            value: message.guild.members.filter(m => m.user.bot).size,
-            inline: true
-        },
-        {
-            name: 'Guilds',
-            value: 'List of all guilds and their info is below',
-            inline: false
-        }
-    ];
-    
     function convertTime(timestamp) {
         timestamp = new Date(timestamp).toString()
         return timestamp

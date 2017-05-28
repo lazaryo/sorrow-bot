@@ -19,7 +19,7 @@ exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, 
     }
     
     if(checkWord(sorrows, w) == false) {
-        return message.TextChannel.send(`\`${w}\` is not a valid word. Use the command \`dictionary\` for a complete list of words.`)
+        return message.channel.sendMessage(`\`${w}\` is not a valid word. Use the command \`dictionary\` for a complete list of words.`)
     } else {
         let sw = singleWord(sorrows, w);
         w = w.toLowerCase();
@@ -38,7 +38,7 @@ exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, 
             }
         });
         if (sw.video != null) {
-            message.TextChannel.send(sw.video);
+            message.channel.sendMessage(sw.video);
         }   
     }
 }
