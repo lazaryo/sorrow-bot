@@ -4,6 +4,9 @@ const Discord = require("discord.js");
 const bot = new Discord.Client();
 const config = require('./config.json');
 
+// Create New Guild Webhook
+const hook = new Discord.WebhookClient(config.webhook.id, config.webhook.token);
+
 const sorrows = require('./words.json');
 const blacklist = require('./blacklist.json');
 const about = config.about;
@@ -107,9 +110,12 @@ bot.on("guildCreate", server => {
     if (botCount > humanCount) {
         console.log(`\n\nGuild ID: ${serverID}`);
         console.log(`Guild Owner: ${serverOwner}, Owner ID: ${serverOwnerID}.`);
-        console.log(`I left the server: ${server.name} because there are too many bots.`);
+        console.log(`I left the server: ${server.name} because there are too many bots.\n\n`);
         server.leave();
     }
+
+    // Send a message using the webhook
+    hook.send('New Guild: ${server.name}\nGuild ID: ${serverID}\nGuild Owner: ${serverOwner}\nOwner ID: ${serverOwnerID}');
 });
 
 // Error stuff
