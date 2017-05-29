@@ -1,11 +1,12 @@
 'use strict';
 
+const fs = require('fs');
 const Discord = require("discord.js");
 const bot = new Discord.Client();
 const config = require('./config.json');
 
 // Create New Guild Webhook
-const hook = new Discord.WebhookClient(config.webhook.id, config.webhook.token);
+//const hook = new Discord.WebhookClient(config.webhook.id, config.webhook.token);
 
 const sorrows = require('./words.json');
 const blacklist = require('./blacklist.json');
@@ -14,7 +15,8 @@ const prefix = '<@299851881746923520>';
 
 // use require() for future references
 bot.on('ready', () => {
-    console.log(`Ready to serve in ${bot.channels.size} channels on ${bot.guilds.size} servers, for a total of ${bot.users.size} users.`);
+    checkBlacklist(bot);
+    console.log(`Ready to serve in ${bot.channels.size} channels on ${bot.guilds.size} servers, for a total of ${bot.users.size} users.\n`);
 });
 
 // response when messages are sent in a channel
@@ -75,7 +77,7 @@ bot.on("message", (message) => {
     
     try {
         let commandFile = require(`${path}${command}.js`);
-        commandFile.run(bot, message, args, about, rn, sorrows, displayWords, checkWord, singleWord, prefix, botUptime, blacklist, checkID);
+        commandFile.run(bot, message, args, about, rn, sorrows, displayWords, checkWord, singleWord, prefix, botUptime, blacklist, checkID, fs);
     } catch (err) {
         // if the command is invalid
         console.error(err);
@@ -113,9 +115,6 @@ bot.on("guildCreate", server => {
         console.log(`I left the server: ${server.name} because there are too many bots.\n\n`);
         server.leave();
     }
-
-    // Send a message using the webhook
-    hook.send('New Guild: ${server.name}\nGuild ID: ${serverID}\nGuild Owner: ${serverOwner}\nOwner ID: ${serverOwnerID}');
 });
 
 // Error stuff
@@ -125,10 +124,44 @@ bot.on('warn', (e) => console.warn(e));
 // Bot logging online
 bot.login(config.token);
 
+// Checking if a Blacklisted Guild is connected to the
+// bot again and leave every 30 minutes
+bot.setInterval(function() {
+    checkBlacklist(bot);
+}, 1800000);
+
 // Display Stats every hour
 bot.setInterval(function() {
     getStats(bot)
 }, 3600000);
+
+// check blacklist with guilds the bot
+// has joined and leave any if there's a match
+function checkBlacklist(bot) {
+    let good = false;
+    
+    for (let guild of bot.guilds) {
+        guild = guild[1];
+        let serverName = guild.name,
+        serverID = guild.id,
+        ownerID = guild.owner.id;
+        
+        if (blacklist.evils.indexOf(serverID) > -1) {
+            for (let evil of blacklist.evils) {
+            if (evil.serverID == serverID) {
+                    guild.leave();
+                    console.log(`I left the guild ${serverName} because it was on the blacklist.`);
+                }
+            }
+        } else {
+            good = true;
+        }
+    }
+    
+    if (good == true) {
+        console.log('\nAll joined servers are good!');
+    }
+}
 
 // Logging the Stats function
 function getStats(bot) {

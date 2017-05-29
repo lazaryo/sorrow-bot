@@ -1,4 +1,4 @@
-exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, singleWord, prefix, botUptime, blacklist, checkID) => {
+exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, singleWord, prefix, botUptime, blacklist, checkID, fs) => {
     const currentGuild = message.guild;
     const currentGuildID = message.guild.id;
     const messageCount = message.content.split(` `).length;
@@ -23,7 +23,28 @@ exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, 
             if (serverID == '299853081578045440' || serverID == '110373943822540800') {
                 return message.channel.sendMessage('Brother man, I\'d rather not leave this server.');
             } else {
-                return message.channel.sendMessage('This ID does match one of the guilds I\'ve joined.');
+                
+                let guildName;
+                for (let guild of bot.guilds) {
+                    guild = guild[1];
+                    let ownerID = guild.owner.id;
+                    
+                    if (serverID == guild.id) {
+                        guildName = guild.name;
+                        
+                        blacklist.evils.push({serverID: Number(serverID), ownerID: Number(ownerID)});
+                        fs.writeFile('blacklist.json', JSON.stringify(blacklist, null, 4), function (err) {
+                            if(err == null) {
+                                console.log('Done!');
+                            } else {
+                                console.log(err);
+                            }
+                        });
+                        
+                        guild.leave();
+                        return message.channel.sendMessage(`I have left the guild ${guildName} and can no loger be apart of the guild anymore.`);
+                    }
+                }
             }
         }
     }

@@ -31,6 +31,7 @@ exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, 
         console.log(`Owner ID: ${server.ownerID}`);
         
         for (let guild of bot.guilds) {
+            guild = guild[1];
             if (server.serverID == guild.id) {
                 guild.leave();
             }
