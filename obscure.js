@@ -6,7 +6,9 @@ const bot = new Discord.Client();
 const config = require('./config.json');
 
 // Create New Guild Webhook
-//const hook = new Discord.WebhookClient(config.webhook.id, config.webhook.token);
+const hooks = config.webhooks;
+const newGuildHook = new Discord.WebhookClient(hooks.newGuild.id, hooks.newGuild.token);
+const blacklistHook = new Discord.WebhookClient(hooks.blacklist.id, hooks.blacklist.token);
 
 const sorrows = require('./words.json');
 const blacklist = require('./blacklist.json');
@@ -15,7 +17,7 @@ const prefix = '<@299851881746923520>';
 
 // use require() for future references
 bot.on('ready', () => {
-    checkBlacklist(bot);
+    checkBlacklist(bot, blacklistHook);
     console.log(`Ready to serve in ${bot.channels.size} channels on ${bot.guilds.size} servers, for a total of ${bot.users.size} users.\n`);
 });
 
@@ -77,7 +79,7 @@ bot.on("message", (message) => {
     
     try {
         let commandFile = require(`${path}${command}.js`);
-        commandFile.run(bot, message, args, about, rn, sorrows, displayWords, checkWord, singleWord, prefix, botUptime, blacklist, checkID, fs);
+        commandFile.run(bot, message, args, about, rn, sorrows, displayWords, checkWord, singleWord, prefix, botUptime, blacklist, checkID, fs, newGuildHook, blacklistHook);
     } catch (err) {
         // if the command is invalid
         console.error(err);
@@ -91,6 +93,8 @@ bot.on("message", (message) => {
 
 // When the bot joins a new server
 bot.on("guildCreate", server => {
+    newServer(server, newGuildHook);
+    
     // Welcome message with a list of commands will be sent to the default channel when joining the guild
     server.defaultChannel.sendMessage('Thanks for adding me. Below are the commands that you can use with me.');
     server.defaultChannel.sendEmbed({
@@ -127,17 +131,36 @@ bot.login(config.token);
 // Checking if a Blacklisted Guild is connected to the
 // bot again and leave every 30 minutes
 bot.setInterval(function() {
-    checkBlacklist(bot);
-}, 1800000);
+    checkBlacklist(bot, blacklistHook);
+}, 3600000);
 
 // Display Stats every hour
 bot.setInterval(function() {
     getStats(bot)
 }, 3600000);
 
+// send new guild information to the new guild channel
+function newServer(server, hook) {
+    function convertTime(timestamp) {
+        timestamp = new Date(timestamp).toString()
+        return timestamp
+    }
+    
+    var botCount = server.members.filter(m => m.user.bot).size;
+    var humanCount = server.members.filter(m => !m.user.bot).size;
+    var serverName = server.name;
+    var serverOwner = server.owner.displayName;
+    var serverOwnerID = server.owner.id;
+    var serverID = server.id;
+    var joined = convertTime(server.joinedTimestamp);
+    
+    // send information to channel about a new server the bot has joined
+    hook.send(`New Server: ${serverName}\n\nServer ID: ${serverID}\nServer Owner: ${serverOwner}\nServer Owner ID: ${serverOwnerID}\nHumans: ${humanCount}\nBots: ${botCount}\nJoined: ${joined}`);
+}
+
 // check blacklist with guilds the bot
 // has joined and leave any if there's a match
-function checkBlacklist(bot) {
+function checkBlacklist(bot, hook) {
     let good = false;
     
     for (let guild of bot.guilds) {
@@ -159,7 +182,7 @@ function checkBlacklist(bot) {
     }
     
     if (good == true) {
-        console.log('\nAll joined servers are good!');
+        hook.send('All joined servers are good!');
     }
 }
 

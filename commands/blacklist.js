@@ -1,4 +1,4 @@
-exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, singleWord, prefix, botUptime, blacklist, checkID, fs) => {
+exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, singleWord, prefix, botUptime, blacklist, checkID, fs, newGuildHook, blacklistHook) => {
     const currentGuild = message.guild;
     const currentGuildID = message.guild.id;
     const messageCount = message.content.split(` `).length;
@@ -33,11 +33,11 @@ exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, 
                         guildName = guild.name;
                         
                         blacklist.evils.push({serverID: Number(serverID), ownerID: Number(ownerID)});
-                        fs.writeFile('blacklist.json', JSON.stringify(blacklist, null, 4), function (err) {
-                            if(err == null) {
-                                console.log('Done!');
+                        fs.writeFile('blacklist.json', JSON.stringify(blacklist, null, 4), function (response) {
+                            if (response != null) {
+                                blacklistHook.send(`${guildName} has been added to the blacklist.`);
                             } else {
-                                console.log(err);
+                                console.log(response);
                             }
                         });
                         
