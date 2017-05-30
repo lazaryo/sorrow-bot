@@ -11,14 +11,15 @@ const newGuildHook = new Discord.WebhookClient(hooks.newGuild.id, hooks.newGuild
 const blacklistHook = new Discord.WebhookClient(hooks.blacklist.id, hooks.blacklist.token);
 
 const sorrows = require('./words.json');
-const blacklist = require('./blacklist.json');
+const banned = require('./banned.json');
+const safe = require('./safe.json');
 const about = config.about;
 const prefix = '<@299851881746923520>';
 
 // use require() for future references
 bot.on('ready', () => {
     checkBlacklist(bot, blacklistHook);
-    console.log(`Ready to serve in ${bot.channels.size} channels on ${bot.guilds.size} servers, for a total of ${bot.users.size} users.\n`);
+    console.log(`Ready to serve in ${bot.channels.size} channels on ${bot.guilds.size} servers, for a total of ${bot.users.size} users.`);
 });
 
 // response when messages are sent in a channel
@@ -79,7 +80,7 @@ bot.on("message", (message) => {
     
     try {
         let commandFile = require(`${path}${command}.js`);
-        commandFile.run(bot, message, args, about, rn, sorrows, displayWords, checkWord, singleWord, prefix, botUptime, blacklist, checkID, fs, newGuildHook, blacklistHook);
+        commandFile.run(bot, message, args, about, rn, sorrows, displayWords, checkWord, singleWord, prefix, botUptime, banned, checkID, fs, newGuildHook, blacklistHook, safe);
     } catch (err) {
         // if the command is invalid
         console.error(err);
@@ -93,7 +94,25 @@ bot.on("message", (message) => {
 
 // When the bot joins a new server
 bot.on("guildCreate", server => {
+    let criticalInfo = {
+        "name": server.name,
+        "id": server.id,
+        "ownerName": server.owner.displayName,
+        "ownerID": server.owner.id,
+        "memberCount": server.members.size,
+        "botCount": server.members.filter(m => m.user.bot).size,
+        "humanCount": server.members.filter(m => !m.user.bot).size
+    }
+    
     newServer(server, newGuildHook);
+    
+    if (botCount / memberCount * 100 >= 80) {
+        banned.blacklist.push(criticalInfo.id);
+        fs.writeFile("./banned.json", JSON.stringify(banned, "", "\t"), err => {
+            bot.users.get("266000833676705792").sendMessage("**Bot Farm blacklisted:** " + criticalInfo.name + " (" + criticalInfo.id + ")\n" + (err ? "Failed to update database" : "Database updated."))
+        }) 
+        return server.leave();
+    }
     
     // Welcome message with a list of commands will be sent to the default channel when joining the guild
     server.defaultChannel.sendMessage('Thanks for adding me. Below are the commands that you can use with me.');
@@ -106,19 +125,6 @@ bot.on("guildCreate", server => {
             value: `${bot.user}`
         }]
     }).catch(error => console.log(error));
-    
-    var botCount = server.members.filter(m => m.user.bot).size;
-    var humanCount = server.members.filter(m => !m.user.bot).size;
-    var serverOwner = server.owner.displayName;
-    var serverOwnerID = server.owner.id;
-    var serverID = server.id;
-    
-    if (botCount > humanCount) {
-        console.log(`\n\nGuild ID: ${serverID}`);
-        console.log(`Guild Owner: ${serverOwner}, Owner ID: ${serverOwnerID}.`);
-        console.log(`I left the server: ${server.name} because there are too many bots.\n\n`);
-        server.leave();
-    }
 });
 
 // Error stuff
@@ -128,16 +134,11 @@ bot.on('warn', (e) => console.warn(e));
 // Bot logging online
 bot.login(config.token);
 
-// Checking if a Blacklisted Guild is connected to the
-// bot again and leave every 30 minutes
+// Checking if a Blacklisted Guild is connected to the bot and leave
+// checking every 30 seconds
 bot.setInterval(function() {
     checkBlacklist(bot, blacklistHook);
-}, 3600000);
-
-// Display Stats every hour
-bot.setInterval(function() {
-    getStats(bot)
-}, 3600000);
+}, 30000);
 
 // send new guild information to the new guild channel
 function newServer(server, hook) {
@@ -146,16 +147,19 @@ function newServer(server, hook) {
         return timestamp
     }
     
-    var botCount = server.members.filter(m => m.user.bot).size;
-    var humanCount = server.members.filter(m => !m.user.bot).size;
-    var serverName = server.name;
-    var serverOwner = server.owner.displayName;
-    var serverOwnerID = server.owner.id;
-    var serverID = server.id;
-    var joined = convertTime(server.joinedTimestamp);
+    let criticalInfo = {
+        "name": server.name,
+        "id": server.id,
+        "ownerName": server.owner.displayName,
+        "ownerID": server.owner.id,
+        "memberCount": server.members.size,
+        "botCount": server.members.filter(m => m.user.bot).size,
+        "humanCount": server.members.filter(m => !m.user.bot).size,
+        "joined": convertTime(server.joinedTimestamp)
+    }
     
     // send information to channel about a new server the bot has joined
-    hook.send(`New Server: ${serverName}\n\nServer ID: ${serverID}\nServer Owner: ${serverOwner}\nServer Owner ID: ${serverOwnerID}\nHumans: ${humanCount}\nBots: ${botCount}\nJoined: ${joined}`);
+    hook.send(`New Server: ${criticalInfo.name}\n\nServer ID: ${criticalInfo.id}\nServer Owner: ${criticalInfo.ownerName}\nServer Owner ID: ${criticalInfo.ownerID}\nHumans: ${criticalInfo.humanCount}\nBots: ${criticalInfo.botCount}\nJoined: ${criticalInfo.joined}`);
 }
 
 // check blacklist with guilds the bot
@@ -169,28 +173,16 @@ function checkBlacklist(bot, hook) {
         serverID = guild.id,
         ownerID = guild.owner.id;
         
-        if (blacklist.evils.indexOf(serverID) > -1) {
-            for (let evil of blacklist.evils) {
-            if (evil.serverID == serverID) {
-                    guild.leave();
-                    console.log(`I left the guild ${serverName} because it was on the blacklist.`);
-                }
-            }
-        } else {
-            good = true;
+        if (banned.blacklist.includes(serverID)) {
+            guild.defaultChannel.sendMessage(":warning: Of all the different ways we reassure ourselves, the least comforting is this: \"it's already too late.\"\nThis guild is on a blacklist; if this was done in error, message lazaryo#9097.");
+            guild.leave();
+            return good = true;
         }
     }
     
     if (good == true) {
         hook.send('All joined servers are good!');
     }
-}
-
-// Logging the Stats function
-function getStats(bot) {
-    console.log('Guilds: ' + bot.guilds.size);
-    console.log('Channels: ' + bot.channels.size);
-    console.log('Users: ' + bot.users.size);
 }
 
 // translating bot uptime
@@ -224,26 +216,12 @@ function botUptime(milliseconds) {
 }
 
 // check if a guild's id exist
-function checkID(id, bot) {
-    let servers = bot.guilds,
-        last = bot.guilds.size,
-        i = 1,
-        lastServerID;
+function checkID(bot, id) {
+    let servers = bot.guilds;
     
-    for (let lastServer of servers) {
-        if (i == last) {
-            lastServerID = lastServer[1].id;
-        }
-        i++;
-    }
-            
-    for (let server of servers) {
-        if( id == server[1].id) {
-            return true
-        }
-    }
-
-    if (lastServerID !== id) {
+    if (servers.includes(id)) {
+        return true
+    } else {
         return false
     }
 }
@@ -267,6 +245,23 @@ function checkWord(sorrows, w) {
     if (sorrows[last].title !== w) {
         return false
     }
+    
+//    New stuff --------------------
+    
+//    var l = '';
+//    var word = w;
+//    
+//    for (const sorrow of sorrows) {
+//        w = w.toLowerCase();
+//        l = sorrow.title;
+//        l = l.toLowerCase();
+//        
+//        if (sorrow.includes(word) || w == l) {
+//            return true
+//        } else {
+//            return false
+//        }
+//    }
 }
     
 // find and return one word with all information
@@ -278,7 +273,7 @@ function singleWord(sorrows, w) {
         w = w.toUpperCase();
         l = sorrow.title.toUpperCase();
 
-        if( word == sorrow.title || w == l ) {
+        if (word == sorrow.title || w == l) {
             return sorrow
         }
     }

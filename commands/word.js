@@ -28,10 +28,6 @@ exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, 
             color: 0x23BDE7,
             title: `${w} - ${sw.speech}`,
             description: `\`\`\`${sw.desc}\`\`\``,
-
-            // optional
-            // timestamp: new Date(),
-
             footer: {
                 icon_url: sw.authorPic,
                 text: sw.author

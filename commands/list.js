@@ -1,4 +1,4 @@
-exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, singleWord, prefix, botUptime, blacklist) => {
+exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, singleWord, prefix, botUptime) => {
     function convertTime(timestamp) {
         timestamp = new Date(timestamp).toString()
         return timestamp
@@ -13,7 +13,7 @@ exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, 
     }
     
     if (currentGuildID != '299853081578045440') {
-        return message.channel.sendMessage('Not in this server!');
+        return message.TextChannel.send('Not in this server!');
     }
     
     if (currentChannelID != '300143870056857600') {
@@ -25,29 +25,24 @@ exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, 
 
         let i = 1;
         for (let n of bot.guilds) {
-            let botCount = n[1].members.filter(m => m.user.bot).size;
-            let humanCount = n[1].members.filter(m => !m.user.bot).size;
-            let guildID = n[1].id;
-            let guildName = n[1].name;
-            let ownerID = n[1].owner.id;
-            let joined = convertTime(n[1].joinedTimestamp);
-            
+            let criticalInfo = {
+                "name": n[1].name,
+                "id": n[1].id,
+                "ownerName": n[1].owner.displayName,
+                "ownerID": n[1].owner.id,
+                "memberCount": n[1].members.size,
+                "botCount": n[1].members.filter(m => m.user.bot).size,
+                "humanCount": n[1].members.filter(m => !m.user.bot).size,
+                "joined": convertTime(n[1].joinedTimestamp)
+            }
             
             let server = {
-                name: guildName,
-                value: `Server ID: ${guildID}\nOwner ID: ${ownerID}\nHuman Size: ${humanCount}\nBot Size: ${botCount}\nJoined: ${joined}`,
+                name: criticalInfo.name,
+                value: `Server ID: ${criticalInfo.id}\nOwner ID: ${criticalInfo.ownerID}\nHuman Size: ${criticalInfo.humanCount}\nBot Size: ${criticalInfo.botCount}\nJoined: ${criticalInfo.joined}`,
                 inline: false
             };
 
             parts.push(server);
-
-            for (let bl of blacklist) {
-                if (guildID == bl.serverID) {
-                    n[i].leave();
-                    console.log('I left this guild.');
-                }
-            }
-
             i++
         }
         return parts;

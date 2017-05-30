@@ -1,6 +1,6 @@
 /* For use to leave guilds that are bot farming */
 /* checking the blacklist.json file */
-exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, singleWord, prefix, botUptime, blacklist) => {
+exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, singleWord, prefix, botUptime, banned) => {
     // converting the guild joined time to a more readable format
     function convertTime(timestamp) {
         timestamp = new Date(timestamp).toString()
@@ -19,17 +19,8 @@ exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, 
     }
     
     // Guilds to leave because they are naughty
-    console.log(`\n\nBlacklisted Guilds\n`);
     let i = 1;
-    for (let server of blacklist) {
-        if (i == 1) {
-            console.log(`Guild ${i}`);
-        } else {
-            console.log(`\nGuild ${i}`);
-        }
-        console.log(`Guild ID: ${server.serverID}`);
-        console.log(`Owner ID: ${server.ownerID}`);
-        
+    for (let server of banned) {
         for (let guild of bot.guilds) {
             guild = guild[1];
             if (server.serverID == guild.id) {
@@ -38,4 +29,5 @@ exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, 
         }
         i++
     }
+    message.reply('I\'ve been cleansed of the evil guilds.');
 }

@@ -1,4 +1,4 @@
-exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, singleWord, prefix, botUptime, blacklist, checkID, fs, newGuildHook, blacklistHook) => {
+exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, singleWord, prefix, botUptime, banned, checkID, fs, newGuildHook, blacklistHook, safe) => {
     const currentGuild = message.guild;
     const currentGuildID = message.guild.id;
     const messageCount = message.content.split(` `).length;
@@ -17,32 +17,34 @@ exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, 
         serverID.shift();
         serverID.shift();
         
-        if (checkID(serverID, bot) == false) {
-            message.channel.sendMessage('This ID does not match any of the guilds I\'ve joined.');
+        if (checkID(bot, serverID) == false) {
+            return message.channel.sendMessage('This ID does not match any of the guilds I\'ve joined.');
         } else {
-            if (serverID == '299853081578045440' || serverID == '110373943822540800') {
+            if (safe.whitelist.includes(serverID)) {
                 return message.channel.sendMessage('Brother man, I\'d rather not leave this server.');
             } else {
-                
                 let guildName;
+                
                 for (let guild of bot.guilds) {
-                    guild = guild[1];
-                    let ownerID = guild.owner.id;
+                    let criticalInfo = {
+                        "name": guild[1].name,
+                        "id": guild[1].id,
+                        "ownerName": guild[1].owner.displayName,
+                        "ownerID": guild[1].owner.id,
+                        "memberCount": guild[1].members.size,
+                        "botCount": guild[1].members.filter(m => m.user.bot).size,
+                        "humanCount": guild[1].members.filter(m => !m.user.bot).size
+                    }
                     
-                    if (serverID == guild.id) {
+                    if (guild.includes(serverID)) {
                         guildName = guild.name;
+                    
+                        banned.blacklist.push(criticalInfo.id);
+                        fs.writeFile("./banned.json", JSON.stringify(banned, "", "\t"), err => {
+                            bot.users.get("266000833676705792").sendMessage("**Bot Farm blacklisted:** " + criticalInfo.name + " (" + criticalInfo.id + ")\n" + (err ? "Failed to update database" : "Database updated."))
+                        })
                         
-                        blacklist.evils.push({serverID: Number(serverID), ownerID: Number(ownerID)});
-                        fs.writeFile('blacklist.json', JSON.stringify(blacklist, null, 4), function (response) {
-                            if (response != null) {
-                                blacklistHook.send(`${guildName} has been added to the blacklist.`);
-                            } else {
-                                console.log(response);
-                            }
-                        });
-                        
-                        guild.leave();
-                        return message.channel.sendMessage(`I have left the guild ${guildName} and can no loger be apart of the guild anymore.`);
+                       return guild.leave();
                     }
                 }
             }

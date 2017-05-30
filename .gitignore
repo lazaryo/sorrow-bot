@@ -4,8 +4,14 @@ config.json
 #words
 words.json
 
-#blacklist
-blacklist.json
+#banned
+banned.json
+
+#safe
+safe.json
+
+#help.txt
+help.txt
 
 # Logs
 logs
