@@ -9,15 +9,15 @@ exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, 
     const currentChannelID = message.channel.id;
     
     if (message.author.id !== "303105492572569600") {
-        return message.TextChannel.send('You don\'t have permission you :chicken:!');
+        return message.channel.send('You don\'t have permission you :chicken:!');
     }
     
     if (currentGuildID != '299853081578045440') {
-        return message.TextChannel.send('Not in this server!');
+        return message.channel.send('Not in this server!');
     }
     
     if (currentChannelID != '300143870056857600') {
-        return message.channel.sendMessage('Use this command in the Admin Channel!');
+        return message.channel.send('Use this command in the Admin Channel!');
     }
     
     function theList() {
@@ -48,15 +48,17 @@ exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, 
         return parts;
     }
     
-    message.channel.sendEmbed({
-        color: 0x23BDE7,
-        title: 'Guild List',
-        description: `Use ${prefix} \`blacklist (Guild ID)\` to blacklist a Guild from using this bot.`,
-        fields: theList(),
-        timestamp: new Date(),
-        footer: {
-            icon_url: bot.user.avatarURL,
-            text: bot.user.username
+    message.channel.send({
+        "embed": {
+            color: 0x23BDE7,
+            title: 'Guild List',
+            description: `Use ${prefix} \`blacklist (Guild ID)\` to blacklist a Guild from using this bot.`,
+            fields: theList(),
+            timestamp: new Date(),
+            footer: {
+                icon_url: bot.user.avatarURL,
+                text: bot.user.username
+            }
         }
     }).catch(error => console.log(error));
     

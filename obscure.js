@@ -28,30 +28,34 @@ bot.on("message", (message) => {
     if (message.author.bot) return;
     
     if (message.channel.type == 'dm') {
-        message.author.sendMessage('I don\'t work within Direct Messages. Use one of the commands below within a text channel.');
-        return message.author.sendEmbed({
-            color: 0x23BDE7,
-            title: 'My Commands',
-            description: '`sorrow`, `word`, `dictionary`, `info`, `help`',
-            fields: [{
-                name: 'Prefix',
-                value: `${bot.user}`
-            }]
+        message.author.send('I don\'t work within Direct Messages. Use one of the commands below within a text channel.');
+        return message.author.send({
+            "embed": {
+                color: 0x23BDE7,
+                title: 'My Commands',
+                description: '`sorrow`, `word`, `dictionary`, `info`, `help`',
+                fields: [{
+                    name: 'Prefix',
+                    value: `${bot.user}`
+                }]
+            }
         }).catch(error => console.log(error));
     };
     
     if (!message.content.startsWith(prefix)) return;
 
     if (message.channel.type !== 'text') {
-        message.author.sendMessage('I don\'t work within Direct Messages. Use one of the commands below within a text channel.');
-        return message.author.sendEmbed({
-            color: 0x23BDE7,
-            title: 'My Commands',
-            description: '`sorrow`, `word`, `dictionary`, `info`, `help`',
-            fields: [{
-                name: 'Prefix',
-                value: `${bot.user}`
-            }]
+        message.author.send('I don\'t work within Direct Messages. Use one of the commands below within a text channel.');
+        return message.author.send({
+            "embed": {
+                color: 0x23BDE7,
+                title: 'My Commands',
+                description: '`sorrow`, `word`, `dictionary`, `info`, `help`',
+                fields: [{
+                    name: 'Prefix',
+                    value: `${bot.user}`
+                }]
+            }
         }).catch(error => console.log(error));
     };
     
@@ -82,7 +86,8 @@ bot.on("message", (message) => {
         let commandFile = require(`${path}${command}.js`);
         commandFile.run(bot, message, args, about, rn, sorrows, displayWords, checkWord, singleWord, prefix, botUptime, banned, checkID, fs, newGuildHook, blacklistHook, safe);
     } catch (err) {
-        // if the command is invalid
+        // if there is an error
+        // at a later date, log this information
         console.error(err);
         console.log(`\n\nFrom Guild: ${message.guild.name}`);
         console.log(`Guild ID: ${message.guild.id}`);
@@ -106,24 +111,27 @@ bot.on("guildCreate", server => {
     
     newServer(server, newGuildHook);
     
-    if (botCount / memberCount * 100 >= 80) {
+    if (criticalInfo.botCount / criticalInfo.memberCount * 100 >= 50) {
         banned.blacklist.push(criticalInfo.id);
         fs.writeFile("./banned.json", JSON.stringify(banned, "", "\t"), err => {
-            bot.users.get("266000833676705792").sendMessage("**Bot Farm blacklisted:** " + criticalInfo.name + " (" + criticalInfo.id + ")\n" + (err ? "Failed to update database" : "Database updated."))
+            bot.users.get("266000833676705792").send("**Bot Farm blacklisted:** " + criticalInfo.name + " (" + criticalInfo.id + ")\n" + (err ? "Failed to update database" : "Database updated."))
         }) 
+        server.defaultChannel.send(":warning:\nOf all the different ways we reassure ourselves, the least comforting is this: \"it's already too late.\"")
         return server.leave();
     }
     
     // Welcome message with a list of commands will be sent to the default channel when joining the guild
-    server.defaultChannel.sendMessage('Thanks for adding me. Below are the commands that you can use with me.');
-    server.defaultChannel.sendEmbed({
-        color: 0x23BDE7,
-        title: 'My Commands',
-        description: '`sorrow`, `word`, `dictionary`, `info`, `help`',
-        fields: [{
-            name: 'Prefix',
-            value: `${bot.user}`
-        }]
+    server.defaultChannel.send('Thanks for adding me. Below are the commands that you can use with me.');
+    server.defaultChannel.send({
+        "embed": {
+            color: 0x23BDE7,
+            title: 'My Commands',
+            description: '`sorrow`, `word`, `dictionary`, `info`, `help`',
+            fields: [{
+                name: 'Prefix',
+                value: `${bot.user}`
+            }]
+        }
     }).catch(error => console.log(error));
 });
 
@@ -165,8 +173,6 @@ function newServer(server, hook) {
 // check blacklist with guilds the bot
 // has joined and leave any if there's a match
 function checkBlacklist(bot, hook) {
-    let good = false;
-    
     for (let guild of bot.guilds) {
         guild = guild[1];
         let serverName = guild.name,
@@ -174,14 +180,10 @@ function checkBlacklist(bot, hook) {
         ownerID = guild.owner.id;
         
         if (banned.blacklist.includes(serverID)) {
-            guild.defaultChannel.sendMessage(":warning: Of all the different ways we reassure ourselves, the least comforting is this: \"it's already too late.\"\nThis guild is on a blacklist; if this was done in error, message lazaryo#9097.");
+            guild.defaultChannel.send(":warning:\nOf all the different ways we reassure ourselves, the least comforting is this: \"it's already too late.\"\nThis guild is on a blacklist; if this was done in error, message lazaryo#9097.");
             guild.leave();
-            return good = true;
+            return hook.send(`Removed Guild: ${serverName}!`);
         }
-    }
-    
-    if (good == true) {
-        hook.send('All joined servers are good!');
     }
 }
 
@@ -219,10 +221,12 @@ function botUptime(milliseconds) {
 function checkID(bot, id) {
     let servers = bot.guilds;
     
-    if (servers.includes(id)) {
-        return true
-    } else {
-        return false
+    for (let server of servers) {
+        if (server.includes(id)) {
+            return true
+        } else {
+            return false
+        }
     }
 }
 
@@ -246,15 +250,16 @@ function checkWord(sorrows, w) {
         return false
     }
     
-//    New stuff --------------------
-    
+//   New stuff --------------------
+
 //    var l = '';
 //    var word = w;
 //    
-//    for (const sorrow of sorrows) {
+//    for (let sorrow of sorrows) {
 //        w = w.toLowerCase();
 //        l = sorrow.title;
 //        l = l.toLowerCase();
+//        console.log(sorrow);
 //        
 //        if (sorrow.includes(word) || w == l) {
 //            return true

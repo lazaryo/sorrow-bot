@@ -5,23 +5,27 @@ exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, 
     let serverID = message.content.split(` `);
     
     if (message.author.id !== "303105492572569600") {
-        return message.channel.sendMessage('You don\'t have permission you :chicken:!');
+        return message.channel.send('You don\'t have permission you :chicken:!');
     }
     if (currentGuildID != '299853081578045440') {
-        return message.channel.sendMessage('Not in this server!');
+        return message.channel.send('Not in this server!');
     }
         
     if (messageCount != 3) {
-        return message.channel.sendMessage('Brother man, you need to add a Guild ID for blacklisting.');
+        return message.channel.send('Brother man, you need to add a Guild ID for blacklisting.');
     } else {
         serverID.shift();
         serverID.shift();
         
+        if (banned.blacklist.includes(serverID)) {
+            return message.channel.send('This server has already been blacklisted.');
+        }
+        
         if (checkID(bot, serverID) == false) {
-            return message.channel.sendMessage('This ID does not match any of the guilds I\'ve joined.');
+            return message.channel.send('This ID does not match any of the guilds I\'ve joined.');
         } else {
             if (safe.whitelist.includes(serverID)) {
-                return message.channel.sendMessage('Brother man, I\'d rather not leave this server.');
+                return message.channel.send('Brother man, I\'d rather not leave this server.');
             } else {
                 let guildName;
                 
@@ -36,12 +40,12 @@ exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, 
                         "humanCount": guild[1].members.filter(m => !m.user.bot).size
                     }
                     
-                    if (guild.includes(serverID)) {
+                    if (guild[1].includes(serverID)) {
                         guildName = guild.name;
                     
                         banned.blacklist.push(criticalInfo.id);
                         fs.writeFile("./banned.json", JSON.stringify(banned, "", "\t"), err => {
-                            bot.users.get("266000833676705792").sendMessage("**Bot Farm blacklisted:** " + criticalInfo.name + " (" + criticalInfo.id + ")\n" + (err ? "Failed to update database" : "Database updated."))
+                            bot.users.get("266000833676705792").send("**Bot Farm blacklisted:** " + criticalInfo.name + " (" + criticalInfo.id + ")\n" + (err ? "Failed to update database" : "Database updated."))
                         })
                         
                        return guild.leave();

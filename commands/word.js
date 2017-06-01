@@ -19,22 +19,25 @@ exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, 
     }
     
     if(checkWord(sorrows, w) == false) {
-        return message.channel.sendMessage(`\`${w}\` is not a valid word. Use the command \`dictionary\` for a complete list of words.`)
+        return message.channel.send(`\`${w}\` is not a valid word. Use the command \`dictionary\` for a complete list of words.`)
     } else {
         let sw = singleWord(sorrows, w);
         w = w.toLowerCase();
         
-        message.channel.sendEmbed({
-            color: 0x23BDE7,
-            title: `${w} - ${sw.speech}`,
-            description: `\`\`\`${sw.desc}\`\`\``,
-            footer: {
-                icon_url: sw.authorPic,
-                text: sw.author
+        message.channel.send({
+            "embed": {
+                color: 0x23BDE7,
+                title: `${w} - ${sw.speech}`,
+                description: `\`\`\`${sw.desc}\`\`\``,
+                footer: {
+                    icon_url: sw.authorPic,
+                    text: sw.author
+                }
             }
-        });
+        }).catch(error => console.log(error));
+        
         if (sw.video != null) {
-            message.channel.sendMessage(sw.video);
+            message.channel.send(sw.video);
         }   
     }
 }
