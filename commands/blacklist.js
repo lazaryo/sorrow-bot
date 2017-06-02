@@ -27,8 +27,6 @@ exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, 
             if (safe.whitelist.includes(serverID)) {
                 return message.channel.send('Brother man, I\'d rather not leave this server.');
             } else {
-                let guildName;
-                
                 for (let guild of bot.guilds) {
                     let criticalInfo = {
                         "name": guild[1].name,
@@ -41,8 +39,6 @@ exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, 
                     }
                     
                     if (guild[1].includes(serverID)) {
-                        guildName = guild.name;
-                    
                         banned.blacklist.push(criticalInfo.id);
                         fs.writeFile("./banned.json", JSON.stringify(banned, "", "\t"), err => {
                             bot.users.get("266000833676705792").send("**Bot Farm blacklisted:** " + criticalInfo.name + " (" + criticalInfo.id + ")\n" + (err ? "Failed to update database" : "Database updated."))
