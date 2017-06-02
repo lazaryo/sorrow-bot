@@ -14,7 +14,7 @@ const sorrows = require('./words.json');
 const banned = require('./banned.json');
 const safe = require('./safe.json');
 const about = config.about;
-const prefix = '<@299851881746923520>';
+const prefix = config.prefix;
 
 // use require() for future references
 bot.on('ready', () => {
@@ -59,27 +59,9 @@ bot.on("message", (message) => {
         }).catch(error => console.log(error));
     };
     
-    var botCount = message.guild.members.filter(m => m.user.bot).size;
-    var humanCount = message.guild.members.filter(m => !m.user.bot).size;
-    var server = message.guild;
-    var serverOwner = message.guild.owner.displayName;
-    var serverOwnerID = message.guild.owner.id;
-    
-    if (botCount > humanCount) {
-        console.log(`Guild Owner: ${serverOwner}`);
-        console.log(`Guild Owner ID: ${serverOwnerID}`);
-        console.log(`Bots: ${botCount}`);
-        console.log(`Humans: ${humanCount}`);
-        server.leave();
-        return console.log(`I left the server: ${server.name} because there are too many bots.`);
-    }
-    
     let command = message.content.split(" ")[1];
-
     var rn = Math.floor(Math.random() * (sorrows.length - 1));
-    
     let args = message.content.split(" ").slice(2);
-    
     var path = './commands/';
     
     try {
@@ -88,6 +70,7 @@ bot.on("message", (message) => {
     } catch (err) {
         // if there is an error
         // at a later date, log this information
+        // to a file
         console.error(err);
         console.log(`\n\nFrom Guild: ${message.guild.name}`);
         console.log(`Guild ID: ${message.guild.id}`);
@@ -111,13 +94,18 @@ bot.on("guildCreate", server => {
     
     newServer(server, newGuildHook);
     
-    if (criticalInfo.botCount / criticalInfo.memberCount * 100 >= 50) {
-        banned.blacklist.push(criticalInfo.id);
-        fs.writeFile("./banned.json", JSON.stringify(banned, "", "\t"), err => {
-            bot.users.get("266000833676705792").send("**Bot Farm blacklisted:** " + criticalInfo.name + " (" + criticalInfo.id + ")\n" + (err ? "Failed to update database" : "Database updated."))
-        }) 
-        server.defaultChannel.send(":warning:\nOf all the different ways we reassure ourselves, the least comforting is this: \"it's already too late.\"")
-        return server.leave();
+    if (criticalInfo.botCount / criticalInfo.memberCount * 100 >= 75) {
+        if (checkID(bot, id, 'blacklist')) {
+            bot.users.get("266000833676705792").send("**Bot Farm:** " + criticalInfo.name + " (" + criticalInfo.id + ") tried to add me within their server.");
+            return server.leave();
+        } else {
+            banned.blacklist.push(criticalInfo.id);
+            fs.writeFile("./banned.json", JSON.stringify(banned, "", "\t"), err => {
+                bot.users.get("266000833676705792").send("**Bot Farm blacklisted:** " + criticalInfo.name + " (" + criticalInfo.id + ")\n" + (err ? "Failed to update database" : "Database updated."))
+            }) 
+            server.defaultChannel.send("Of all the different ways we reassure ourselves, the least comforting is this: \"it's already too late.\"")
+            return server.leave();
+        }
     }
     
     // Welcome message with a list of commands will be sent to the default channel when joining the guild
@@ -170,6 +158,27 @@ function newServer(server, hook) {
     hook.send(`New Server: ${criticalInfo.name}\n\nServer ID: ${criticalInfo.id}\nServer Owner: ${criticalInfo.ownerName}\nServer Owner ID: ${criticalInfo.ownerID}\nHumans: ${criticalInfo.humanCount}\nBots: ${criticalInfo.botCount}\nJoined: ${criticalInfo.joined}`);
 }
 
+// check if a guild's id exist
+function checkID(bot, id, location) {
+    let servers = bot.guilds;
+    
+    if (location == 'blacklist') {
+        if (banned.blacklist.includes(id)) {
+            return true
+        } else {
+            return false
+        }
+    } else if (location == 'other') {
+        for (let server of servers) {
+            if (server.includes(id)) {
+                return true
+            } else {
+                return false
+            }
+        }
+    }
+}
+
 // check blacklist with guilds the bot
 // has joined and leave any if there's a match
 function checkBlacklist(bot, hook) {
@@ -180,7 +189,7 @@ function checkBlacklist(bot, hook) {
         ownerID = guild.owner.id;
         
         if (banned.blacklist.includes(serverID)) {
-            guild.defaultChannel.send(":warning:\nOf all the different ways we reassure ourselves, the least comforting is this: \"it's already too late.\"\nThis guild is on a blacklist; if this was done in error, message lazaryo#9097.");
+            guild.defaultChannel.send("Of all the different ways we reassure ourselves, the least comforting is this: \"it's already too late.\"");
             guild.leave();
             return hook.send(`Removed Guild: ${serverName}!`);
         }
@@ -215,19 +224,6 @@ function botUptime(milliseconds) {
         return seconds + ' second' + numberEnding(seconds);
     }
     return 'just now';
-}
-
-// check if a guild's id exist
-function checkID(bot, id) {
-    let servers = bot.guilds;
-    
-    for (let server of servers) {
-        if (server.includes(id)) {
-            return true
-        } else {
-            return false
-        }
-    }
 }
 
 // check if word submitted exists in the dictionary

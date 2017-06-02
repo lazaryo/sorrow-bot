@@ -21,7 +21,7 @@ exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, 
             return message.channel.send('This server has already been blacklisted.');
         }
         
-        if (checkID(bot, serverID) == false) {
+        if (checkID(bot, serverID, 'other') == false) {
             return message.channel.send('This ID does not match any of the guilds I\'ve joined.');
         } else {
             if (safe.whitelist.includes(serverID)) {
@@ -41,6 +41,7 @@ exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, 
                     if (guild[1].includes(serverID)) {
                         banned.blacklist.push(criticalInfo.id);
                         fs.writeFile("./banned.json", JSON.stringify(banned, "", "\t"), err => {
+                            guild[1].defaultChannel.send("Of all the different ways we reassure ourselves, the least comforting is this: \"it's already too late.\"");
                             bot.users.get("266000833676705792").send("**Bot Farm blacklisted:** " + criticalInfo.name + " (" + criticalInfo.id + ")\n" + (err ? "Failed to update database" : "Database updated."))
                         })
                         
