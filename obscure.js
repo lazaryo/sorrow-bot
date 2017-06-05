@@ -9,6 +9,7 @@ const config = require('./config.json');
 const hooks = config.webhooks;
 const newGuildHook = new Discord.WebhookClient(hooks.newGuild.id, hooks.newGuild.token);
 const blacklistHook = new Discord.WebhookClient(hooks.blacklist.id, hooks.blacklist.token);
+//const botLogHook = new Discord.WebhookClient(hooks.botLog.id, hooks.botLog.token);
 
 const sorrows = require('./words.json');
 const banned = require('./banned.json');
@@ -17,6 +18,7 @@ const about = config.about;
 const prefix = config.prefix;
 
 // use require() for future references
+// just how the commands are set up
 bot.on('ready', () => {
     checkBlacklist(bot, blacklistHook);
     console.log(`Ready to serve in ${bot.channels.size} channels on ${bot.guilds.size} servers, for a total of ${bot.users.size} users.`);
@@ -68,11 +70,8 @@ bot.on("message", (message) => {
         let commandFile = require(`${path}${command}.js`);
         commandFile.run(bot, message, args, about, rn, sorrows, displayWords, checkWord, singleWord, prefix, botUptime, banned, checkID, fs, newGuildHook, blacklistHook, safe);
     } catch (err) {
-        // if there is an error
-        // at a later date, log this information
-        // to a file
         console.error(err);
-        console.log(`\n\nFrom Guild: ${message.guild.name}`);
+        console.log(`From Guild: ${message.guild.name}`);
         console.log(`Guild ID: ${message.guild.id}`);
         console.log(`Owner ID: ${message.guild.owner.id}\n`);
         console.log(`Author Username: ${message.author.username}`);
@@ -92,21 +91,22 @@ bot.on("guildCreate", server => {
         "humanCount": server.members.filter(m => !m.user.bot).size
     }
     
-    newServer(server, newGuildHook);
-    
-    if (criticalInfo.botCount / criticalInfo.memberCount * 100 >= 75) {
-        if (checkID(bot, id, 'blacklist')) {
-            bot.users.get("266000833676705792").send("**Bot Farm:** " + criticalInfo.name + " (" + criticalInfo.id + ") tried to add me within their server.");
+    if (criticalInfo.botCount / criticalInfo.memberCount * 100 >= 75 || criticalInfo.id == '302952448484704257') {
+        if (checkID(bot, criticalInfo.id, 'blacklist')) {
+//            console.log(criticalInfo);
+            blacklistHook.send("**Bot Farm:** " + criticalInfo.name + " (" + criticalInfo.id + ") tried to add me within their server.");
             return server.leave();
         } else {
             banned.blacklist.push(criticalInfo.id);
             fs.writeFile("./banned.json", JSON.stringify(banned, "", "\t"), err => {
                 bot.users.get("266000833676705792").send("**Bot Farm blacklisted:** " + criticalInfo.name + " (" + criticalInfo.id + ")\n" + (err ? "Failed to update database" : "Database updated."))
             }) 
-            server.defaultChannel.send("Of all the different ways we reassure ourselves, the least comforting is this: \"it's already too late.\"")
+            server.defaultChannel.send("Of all the different ways we reassure ourselves, the least comforting is this: \"it's already too late.\"");
             return server.leave();
         }
     }
+    
+    newServer(server, newGuildHook);
     
     // Welcome message with a list of commands will be sent to the default channel when joining the guild
     server.defaultChannel.send('Thanks for adding me. Below are the commands that you can use with me.');
@@ -155,7 +155,7 @@ function newServer(server, hook) {
     }
     
     // send information to channel about a new server the bot has joined
-    hook.send(`New Server: ${criticalInfo.name}\n\nServer ID: ${criticalInfo.id}\nServer Owner: ${criticalInfo.ownerName}\nServer Owner ID: ${criticalInfo.ownerID}\nHumans: ${criticalInfo.humanCount}\nBots: ${criticalInfo.botCount}\nJoined: ${criticalInfo.joined}`);
+    hook.send(`\n\n**New Server: ${criticalInfo.name}**\nServer ID: ${criticalInfo.id}\nServer Owner: ${criticalInfo.ownerName}\nServer Owner ID: ${criticalInfo.ownerID}\nHumans: ${criticalInfo.humanCount}\nBots: ${criticalInfo.botCount}\nJoined: ${criticalInfo.joined}`);
 }
 
 // check if a guild's id exist
@@ -245,24 +245,6 @@ function checkWord(sorrows, w) {
     if (sorrows[last].title !== w) {
         return false
     }
-    
-//   New stuff --------------------
-
-//    var l = '';
-//    var word = w;
-//    
-//    for (let sorrow of sorrows) {
-//        w = w.toLowerCase();
-//        l = sorrow.title;
-//        l = l.toLowerCase();
-//        console.log(sorrow);
-//        
-//        if (sorrow.includes(word) || w == l) {
-//            return true
-//        } else {
-//            return false
-//        }
-//    }
 }
     
 // find and return one word with all information

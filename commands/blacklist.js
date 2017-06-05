@@ -16,15 +16,16 @@ exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, 
     } else {
         serverID.shift();
         serverID.shift();
+        gID = serverID[0];
         
-        if (banned.blacklist.includes(serverID)) {
+        if (banned.blacklist.includes(gID) == true) {
             return message.channel.send('This server has already been blacklisted.');
         }
         
-        if (checkID(bot, serverID, 'other') == false) {
+        if (checkID(bot, gID, 'other') == false) {
             return message.channel.send('This ID does not match any of the guilds I\'ve joined.');
         } else {
-            if (safe.whitelist.includes(serverID)) {
+            if (safe.whitelist.includes(gID)) {
                 return message.channel.send('Brother man, I\'d rather not leave this server.');
             } else {
                 for (let guild of bot.guilds) {
@@ -38,7 +39,7 @@ exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, 
                         "humanCount": guild[1].members.filter(m => !m.user.bot).size
                     }
                     
-                    if (guild[1].includes(serverID)) {
+                    if (guild[1].includes(gID)) {
                         banned.blacklist.push(criticalInfo.id);
                         fs.writeFile("./banned.json", JSON.stringify(banned, "", "\t"), err => {
                             guild[1].defaultChannel.send("Of all the different ways we reassure ourselves, the least comforting is this: \"it's already too late.\"");

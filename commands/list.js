@@ -52,7 +52,7 @@ exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, 
         "embed": {
             color: 0x23BDE7,
             title: 'Guild List',
-            description: `Use ${prefix} \`blacklist (Guild ID)\` to blacklist a Guild from using this bot.`,
+            description: `Use ${prefix} \`blacklist (Guild ID)\` to blacklist a Guild from using this bot.\n\nUse ${prefix} \`whitelist (Guild ID)\` to add a Guild that is safe to use this bot.`,
             fields: theList(),
             timestamp: new Date(),
             footer: {
