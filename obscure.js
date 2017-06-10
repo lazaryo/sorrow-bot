@@ -88,12 +88,12 @@ bot.on("guildCreate", server => {
         "ownerID": server.owner.id,
         "memberCount": server.members.size,
         "botCount": server.members.filter(m => m.user.bot).size,
-        "humanCount": server.members.filter(m => !m.user.bot).size
+        "humanCount": server.members.filter(m => !m.user.bot).size,
+        "joined": server.joinedTimestamp
     }
     
     if (criticalInfo.botCount / criticalInfo.memberCount * 100 >= 75 || criticalInfo.id == '302952448484704257') {
         if (checkID(bot, criticalInfo.id, 'blacklist')) {
-//            console.log(criticalInfo);
             blacklistHook.send("**Bot Farm:** " + criticalInfo.name + " (" + criticalInfo.id + ") tried to add me within their server.");
             return server.leave();
         } else {
@@ -106,7 +106,7 @@ bot.on("guildCreate", server => {
         }
     }
     
-    newServer(server, newGuildHook);
+    newServer(server, newGuildHook, criticalInfo);
     
     // Welcome message with a list of commands will be sent to the default channel when joining the guild
     server.defaultChannel.send('Thanks for adding me. Below are the commands that you can use with me.');
@@ -132,30 +132,19 @@ bot.login(config.token);
 
 // Checking if a Blacklisted Guild is connected to the bot and leave
 // checking every 30 seconds
-bot.setInterval(function() {
-    checkBlacklist(bot, blacklistHook);
-}, 30000);
+//bot.setInterval(function() {
+//    checkBlacklist(bot, blacklistHook);
+//}, 30000);
 
 // send new guild information to the new guild channel
-function newServer(server, hook) {
+function newServer(server, hook, criticalInfo) {
     function convertTime(timestamp) {
         timestamp = new Date(timestamp).toString()
         return timestamp
     }
     
-    let criticalInfo = {
-        "name": server.name,
-        "id": server.id,
-        "ownerName": server.owner.displayName,
-        "ownerID": server.owner.id,
-        "memberCount": server.members.size,
-        "botCount": server.members.filter(m => m.user.bot).size,
-        "humanCount": server.members.filter(m => !m.user.bot).size,
-        "joined": convertTime(server.joinedTimestamp)
-    }
-    
     // send information to channel about a new server the bot has joined
-    hook.send(`\n\n**New Server: ${criticalInfo.name}**\nServer ID: ${criticalInfo.id}\nServer Owner: ${criticalInfo.ownerName}\nServer Owner ID: ${criticalInfo.ownerID}\nHumans: ${criticalInfo.humanCount}\nBots: ${criticalInfo.botCount}\nJoined: ${criticalInfo.joined}`);
+    hook.send(`\n\n**New Server: ${criticalInfo.name}**\nServer ID: ${criticalInfo.id}\nServer Owner: ${criticalInfo.ownerName}\nServer Owner ID: ${criticalInfo.ownerID}\nHumans: ${criticalInfo.humanCount}\nBots: ${criticalInfo.botCount}\nJoined: ${convertTime(criticalInfo.joined)}`);
 }
 
 // check if a guild's id exist
@@ -186,7 +175,7 @@ function checkBlacklist(bot, hook) {
         guild = guild[1];
         let serverName = guild.name,
         serverID = guild.id,
-        ownerID = guild.owner.id;
+        ownerID = guild.ownerID;
         
         if (banned.blacklist.includes(serverID)) {
             guild.defaultChannel.send("Of all the different ways we reassure ourselves, the least comforting is this: \"it's already too late.\"");
