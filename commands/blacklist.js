@@ -48,7 +48,7 @@ exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, 
                     if (guild[1].includes(gID)) {
                         banned.blacklist.push(criticalInfo.id);
                         fs.writeFile("./banned.json", JSON.stringify(banned, "", "\t"), err => {
-                            guild[1].defaultChannel.send("Of all the different ways we reassure ourselves, the least comforting is this: \"it's already too late.\"");
+                            guild[1].defaultChannel.send("Of all the different ways we reassure ourselves, the least comforting is this: \"It's already too late.\"");
                             bot.users.get("266000833676705792").send("**Bot Farm blacklisted:** " + criticalInfo.name + " (" + criticalInfo.id + ")\n" + (err ? "Failed to update database" : "Database updated."))
                         })
                         

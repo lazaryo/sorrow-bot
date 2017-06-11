@@ -94,14 +94,14 @@ bot.on("guildCreate", server => {
     
     if (criticalInfo.botCount / criticalInfo.memberCount * 100 >= 75 || criticalInfo.id == '302952448484704257') {
         if (checkID(bot, criticalInfo.id, 'blacklist')) {
-            blacklistHook.send("**Bot Farm:** " + criticalInfo.name + " (" + criticalInfo.id + ") tried to add me within their server.");
+            blacklistHook.send("**Bot Farm:** " + criticalInfo.name + " (" + criticalInfo.id + ") tried to add me within their server.").then(message => console.log(`\nSent message:\n${message.content}`)).catch(console.error);
             return server.leave();
         } else {
             banned.blacklist.push(criticalInfo.id);
             fs.writeFile("./banned.json", JSON.stringify(banned, "", "\t"), err => {
                 bot.users.get("266000833676705792").send("**Bot Farm blacklisted:** " + criticalInfo.name + " (" + criticalInfo.id + ")\n" + (err ? "Failed to update database" : "Database updated."))
             }) 
-            server.defaultChannel.send("Of all the different ways we reassure ourselves, the least comforting is this: \"it's already too late.\"");
+            server.defaultChannel.send("Of all the different ways we reassure ourselves, the least comforting is this: \"It's already too late.\"");
             return server.leave();
         }
     }
@@ -144,7 +144,7 @@ function newServer(server, hook, criticalInfo) {
     }
     
     // send information to channel about a new server the bot has joined
-    hook.send(`\n\n**New Server: ${criticalInfo.name}**\nServer ID: ${criticalInfo.id}\nServer Owner: ${criticalInfo.ownerName}\nServer Owner ID: ${criticalInfo.ownerID}\nHumans: ${criticalInfo.humanCount}\nBots: ${criticalInfo.botCount}\nJoined: ${convertTime(criticalInfo.joined)}`);
+    hook.send(`\n\n**New Server: ${criticalInfo.name}**\nServer ID: ${criticalInfo.id}\nServer Owner: ${criticalInfo.ownerName}\nServer Owner ID: ${criticalInfo.ownerID}\nHumans: ${criticalInfo.humanCount}\nBots: ${criticalInfo.botCount}\nJoined: ${convertTime(criticalInfo.joined)}`).then(message => console.log(`\nSent message:\n${message.content}`)).catch(console.error);
 }
 
 // check if a guild's id exist
@@ -178,9 +178,9 @@ function checkBlacklist(bot, hook) {
         ownerID = guild.ownerID;
         
         if (banned.blacklist.includes(serverID)) {
-            guild.defaultChannel.send("Of all the different ways we reassure ourselves, the least comforting is this: \"it's already too late.\"");
+            guild.defaultChannel.send("Of all the different ways we reassure ourselves, the least comforting is this: \"It's already too late.\"");
             guild.leave();
-            return hook.send(`Removed Guild: ${serverName}!`);
+            return hook.send(`Removed Guild: ${serverName}!`).then(message => console.log(`Sent message:\n${message.content}`)).catch(console.error);
         }
     }
 }
