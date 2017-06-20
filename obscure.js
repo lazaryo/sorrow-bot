@@ -28,38 +28,9 @@ bot.on('ready', () => {
 bot.on("message", (message) => {
     if (message.author.id == about.ownerID) return;
     if (message.author.bot) return;
-    
-    if (message.channel.type == 'dm') {
-        message.author.send('I don\'t work within Direct Messages. Use one of the commands below within a text channel.');
-        return message.author.send({
-            "embed": {
-                color: 0x23BDE7,
-                title: 'My Commands',
-                description: '`sorrow`, `word`, `dictionary`, `info`, `help`',
-                fields: [{
-                    name: 'Prefix',
-                    value: `${bot.user}`
-                }]
-            }
-        }).catch(error => console.log(error));
-    };
-    
-    if (!message.content.startsWith(prefix)) return;
-
-    if (message.channel.type !== 'text') {
-        message.author.send('I don\'t work within Direct Messages. Use one of the commands below within a text channel.');
-        return message.author.send({
-            "embed": {
-                color: 0x23BDE7,
-                title: 'My Commands',
-                description: '`sorrow`, `word`, `dictionary`, `info`, `help`',
-                fields: [{
-                    name: 'Prefix',
-                    value: `${bot.user}`
-                }]
-            }
-        }).catch(error => console.log(error));
-    };
+    if (!message.content.startsWith(prefix.default) || !message.content.startsWith(prefix.nickname)) return;
+    if (message.channel.type == 'dm') return;
+    if (message.channel.type !== 'text') return;
     
     let command = message.content.split(" ")[1];
     var rn = Math.floor(Math.random() * (sorrows.length - 1));
