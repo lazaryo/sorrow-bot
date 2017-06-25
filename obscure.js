@@ -26,9 +26,11 @@ bot.on('ready', () => {
 
 // response when messages are sent in a channel
 bot.on("message", (message) => {
+    const messagePrefix = message.content.split(" ")[0];
     if (message.author.id == about.ownerID) return;
     if (message.author.bot) return;
-    if (!message.content.startsWith(prefix.default) || !message.content.startsWith(prefix.nickname)) return;
+        
+    if (!prefix.includes(messagePrefix)) return;
     if (message.channel.type == 'dm') return;
     if (message.channel.type !== 'text') return;
     
@@ -106,6 +108,25 @@ bot.login(config.token);
 //bot.setInterval(function() {
 //    checkBlacklist(bot, blacklistHook);
 //}, 30000);
+
+// If possible, change the bot's nickname every hour
+//bot.setInterval(function() {
+//    setNickname(bot);
+//}, 5000);
+//}, 3600000);
+
+// set bot nickname
+//function setNickname(bot) {
+//    for (let guild of bot.guilds) {
+//        guild = guild[1];
+//        let currentNickname = guild.members.get("299851881746923520").nickname;
+//        
+//        if (currentNickname != 'SorrowBot') {
+//            guild.members.get("299851881746923520").setNickname('SorrowBot');
+//            console.log(`Changed nickname in ${guild.name}`);
+//        }
+//    }
+//}
 
 // send new guild information to the new guild channel
 function newServer(server, hook, criticalInfo) {
