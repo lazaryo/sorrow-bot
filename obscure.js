@@ -67,7 +67,7 @@ bot.on("guildCreate", server => {
     
     if (criticalInfo.botCount / criticalInfo.memberCount * 100 >= 75 || criticalInfo.id == '302952448484704257') {
         if (checkID(bot, criticalInfo.id, 'blacklist')) {
-            blacklistHook.send("**Bot Farm:** " + criticalInfo.name + " (" + criticalInfo.id + ") tried to add me within their server.").then(message => console.log(`\nSent message:\n${message.content}`)).catch(console.error);
+            blacklistHook.send("**Bot Farm:** " + criticalInfo.name + " (" + criticalInfo.id + ") tried to add me within their server. Bots:" + criticalInfo.botCount).then(message => console.log(`\nSent message:\n${message.content}`)).catch(console.error);
             return server.leave();
         } else {
             banned.blacklist.push(criticalInfo.id);
