@@ -67,7 +67,7 @@ bot.on("guildCreate", server => {
     
     if (criticalInfo.botCount / criticalInfo.memberCount * 100 >= 75 || criticalInfo.id == '302952448484704257') {
         if (checkID(bot, criticalInfo.id, 'blacklist')) {
-            blacklistHook.send("**Bot Farm:** " + criticalInfo.name + " (" + criticalInfo.id + ") tried to add me within their server. Bots:" + criticalInfo.botCount).then(message => console.log(`\nSent message:\n${message.content}`)).catch(console.error);
+            blacklistHook.send("**Bot Farm:** " + criticalInfo.name + " (" + criticalInfo.id + ") tried to add me within their server. Bots: " + criticalInfo.botCount).then(message => console.log(`\nSent message:\n${message.content}`)).catch(console.error);
             return server.leave();
         } else {
             banned.blacklist.push(criticalInfo.id);
@@ -102,31 +102,6 @@ bot.on('warn', (e) => console.warn(e));
 
 // Bot logging online
 bot.login(config.token);
-
-// Checking if a Blacklisted Guild is connected to the bot and leave
-// checking every 30 seconds
-//bot.setInterval(function() {
-//    checkBlacklist(bot, blacklistHook);
-//}, 30000);
-
-// If possible, change the bot's nickname every hour
-//bot.setInterval(function() {
-//    setNickname(bot);
-//}, 5000);
-//}, 3600000);
-
-// set bot nickname
-//function setNickname(bot) {
-//    for (let guild of bot.guilds) {
-//        guild = guild[1];
-//        let currentNickname = guild.members.get("299851881746923520").nickname;
-//        
-//        if (currentNickname != 'SorrowBot') {
-//            guild.members.get("299851881746923520").setNickname('SorrowBot');
-//            console.log(`Changed nickname in ${guild.name}`);
-//        }
-//    }
-//}
 
 // send new guild information to the new guild channel
 function newServer(server, hook, criticalInfo) {
@@ -170,7 +145,7 @@ function checkBlacklist(bot, hook) {
         ownerID = guild.ownerID;
         
         if (banned.blacklist.includes(serverID)) {
-            guild.defaultChannel.send("Of all the different ways we reassure ourselves, the least comforting is this: \"It's already too late.\"");
+            //guild.defaultChannel.send("Of all the different ways we reassure ourselves, the least comforting is this: \"It's already too late.\"");
             guild.leave();
             return hook.send(`Removed Guild: ${serverName}!`).then(message => console.log(`Sent message:\n${message.content}`)).catch(console.error);
         }
