@@ -1,9 +1,4 @@
-exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, singleWord, prefix, botUptime) => {
-    function convertTime(timestamp) {
-        timestamp = new Date(timestamp).toString()
-        return timestamp
-    }
-    
+exports.run = (bot, message, args, about, rn, sorrows, convertTime, displayWords, checkWord, singleWord, prefix, botUptime) => {
     const currentGuild = message.guild;
     const currentGuildID = message.guild.id;
     const currentChannelID = message.channel.id;

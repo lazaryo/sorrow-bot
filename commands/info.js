@@ -1,4 +1,4 @@
-exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, singleWord, prefix, botUptime) => {
+exports.run = (bot, message, args, about, rn, sorrows, convertTime, displayWords, checkWord, singleWord, prefix, botUptime) => {
     message.channel.send({
         "embed": {
             color: 0x23BDE7,
@@ -63,9 +63,4 @@ exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, 
             }
         }
     });
-    
-    function convertTime(timestamp) {
-        timestamp = new Date(timestamp).toString()
-        return timestamp
-    }
 }

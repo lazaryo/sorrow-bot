@@ -1,4 +1,4 @@
-exports.run = (bot, message, args, about, rn, sorrows, displayWords, checkWord, singleWord, prefix) => {
+exports.run = (bot, message, args, about, rn, sorrows, convertTime, displayWords, checkWord, singleWord, prefix) => {
     const wordCount = message.content.split(` `).length;
     let words = message.content.split(` `);
     var w = '';

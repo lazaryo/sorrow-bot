@@ -4,12 +4,26 @@ const fs = require('fs');
 const Discord = require("discord.js");
 const bot = new Discord.Client();
 const config = require('./config.json');
+const chalk = require('chalk');
+var clk = new chalk.constructor({enabled: true});
+
+var cWarn = clk.bgYellow.black;
+var cError = clk.bgRed.black;
+var cDebug = clk.bgWhite.black;
+var cGreen = clk.bold.green;
+var cGrey = clk.bold.grey;
+var cYellow = clk.bold.yellow;
+var cBlue = clk.bold.blue;
+var cRed = clk.bold.red;
+var cServer = clk.bold.magenta;
+var cUYellow = clk.bold.underline.yellow;
+var cBgGreen = clk.bgGreen.black;
 
 // Create New Guild Webhook
 const hooks = config.webhooks;
 const newGuildHook = new Discord.WebhookClient(hooks.newGuild.id, hooks.newGuild.token);
 const blacklistHook = new Discord.WebhookClient(hooks.blacklist.id, hooks.blacklist.token);
-//const botLogHook = new Discord.WebhookClient(hooks.botLog.id, hooks.botLog.token);
+const botLogHook = new Discord.WebhookClient(hooks.botLog.id, hooks.botLog.token);
 
 const sorrows = require('./words.json');
 const banned = require('./banned.json');
@@ -21,7 +35,7 @@ const prefix = config.prefix;
 // just how the commands are set up
 bot.on('ready', () => {
     checkBlacklist(bot, blacklistHook);
-    console.log(`Ready to serve in ${bot.channels.size} channels on ${bot.guilds.size} servers, for a total of ${bot.users.size} users.`);
+    console.log(cBlue(`Ready to serve in ${bot.channels.size} channels on ${bot.guilds.size} servers, for a total of ${bot.users.size} users.`));
 });
 
 // response when messages are sent in a channel
@@ -41,14 +55,14 @@ bot.on("message", (message) => {
     
     try {
         let commandFile = require(`${path}${command}.js`);
-        commandFile.run(bot, message, args, about, rn, sorrows, displayWords, checkWord, singleWord, prefix, botUptime, banned, checkID, fs, newGuildHook, blacklistHook, safe);
+        commandFile.run(bot, message, args, about, rn, sorrows, convertTime, displayWords, checkWord, singleWord, prefix, botUptime, banned, checkID, fs, newGuildHook, blacklistHook, safe);
     } catch (err) {
         console.error(err);
-        console.log(`From Guild: ${message.guild.name}`);
-        console.log(`Guild ID: ${message.guild.id}`);
-        console.log(`Owner ID: ${message.guild.owner.id}\n`);
-        console.log(`Author Username: ${message.author.username}`);
-        console.log(`Author ID: ${message.author.id}`);
+        console.log(cRed(`From Guild: ${message.guild.name}`));
+        console.log(cRed(`Guild ID: ${message.guild.id}`));
+        console.log(cRed(`Owner ID: ${message.guild.owner.id}\n`));
+        console.log(cRed(`Author Username: ${message.author.username}`));
+        console.log(cRed(`Author ID: ${message.author.id}`));
     }
 });
 
@@ -97,11 +111,39 @@ bot.on("guildCreate", server => {
 });
 
 // Error stuff
-bot.on('error', (e) => console.error(e));
-bot.on('warn', (e) => console.warn(e));
+bot.on('error', (e) => console.error(cError(e)));
+bot.on('warn', (e) => console.warn(cWarn(e)));
 
 // Bot logging online
 bot.login(config.token);
+
+// Bot attempting to login if disconnected
+bot.on("disconnected", () => {
+
+    
+	console.log(cRed("Disconnected") + " from Discord");
+    botLogHook.send(`Disconnected from Discord on ${convertTime()}`);
+	setTimeout(() => {
+		console.log(cBlue("Attempting to log in..."));
+		bot.login(config.token, (err, token) => {
+			if (err) { console.log(err); setTimeout(() => { process.exit(1); }, 2000); }
+			if (!token) { console.log(cWarn(" WARN ") + " failed to connect"); setTimeout(() => { process.exit(0); }, 2000); }
+            console.log(cServer('Connection to Discord has been reestablished.'));
+		});
+	});
+});
+
+// Converting time to a readable format
+function convertTime(timestamp) {
+    if (timestamp) {
+        timestamp = new Date(timestamp).toString()
+        return timestamp 
+    }
+    
+    timestamp = new Date().toString()
+    return timestamp
+    
+}
 
 // send new guild information to the new guild channel
 function newServer(server, hook, criticalInfo) {
@@ -111,7 +153,7 @@ function newServer(server, hook, criticalInfo) {
     }
     
     // send information to channel about a new server the bot has joined
-    hook.send(`\n\n**New Server: ${criticalInfo.name}**\nServer ID: ${criticalInfo.id}\nServer Owner: ${criticalInfo.ownerName}\nServer Owner ID: ${criticalInfo.ownerID}\nHumans: ${criticalInfo.humanCount}\nBots: ${criticalInfo.botCount}\nJoined: ${convertTime(criticalInfo.joined)}`).then(message => console.log(`\nSent message:\n${message.content}`)).catch(console.error);
+    hook.send(`\n\n**New Server: ${criticalInfo.name}**\nServer ID: ${criticalInfo.id}\nServer Owner: ${criticalInfo.ownerName}\nServer Owner ID: ${criticalInfo.ownerID}\nHumans: ${criticalInfo.humanCount}\nBots: ${criticalInfo.botCount}\nJoined: ${convertTime(criticalInfo.joined)}`).then(message => console.log(cDebug(`\nSent message:\n${message.content}`))).catch(console.error);
 }
 
 // check if a guild's id exist
@@ -147,7 +189,7 @@ function checkBlacklist(bot, hook) {
         if (banned.blacklist.includes(serverID)) {
             //guild.defaultChannel.send("Of all the different ways we reassure ourselves, the least comforting is this: \"It's already too late.\"");
             guild.leave();
-            return hook.send(`Removed Guild: ${serverName}!`).then(message => console.log(`Sent message:\n${message.content}`)).catch(console.error);
+            return hook.send(`Removed Guild: ${serverName}!`).then(message => console.log(cDebug(`Sent message:\n${message.content}`))).catch(console.error);
         }
     }
 }
