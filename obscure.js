@@ -119,10 +119,9 @@ bot.login(config.token);
 
 // Bot attempting to login if disconnected
 bot.on("disconnected", () => {
-
-    
 	console.log(cRed("Disconnected") + " from Discord");
     botLogHook.send(`Disconnected from Discord on ${convertTime()}`);
+    
 	setTimeout(() => {
 		console.log(cBlue("Attempting to log in..."));
 		bot.login(config.token, (err, token) => {
