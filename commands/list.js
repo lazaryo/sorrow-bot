@@ -1,4 +1,4 @@
-exports.run = (bot, message, args, about, rn, sorrows, convertTime, displayWords, checkWord, singleWord, prefix, botUptime) => {
+exports.run = (bot, message, args, serverSorrows, about, rn, convertTime, displayWords, checkWord, singleWord, prefix, botUptime) => {
     const currentGuild = message.guild;
     const currentGuildID = message.guild.id;
     const currentChannelID = message.channel.id;

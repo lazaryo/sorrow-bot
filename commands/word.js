@@ -1,4 +1,4 @@
-exports.run = (bot, message, args, newOne, about, rn, sorrows, convertTime, displayWords, checkWord, singleWord, prefix) => {
+exports.run = (bot, message, args, serverSorrows, about, rn, convertTime, displayWords, checkWord, singleWord, prefix) => {
     const wordCount = message.content.split(` `).length;
     let words = message.content.split(` `);
     var w = '';
@@ -18,19 +18,19 @@ exports.run = (bot, message, args, newOne, about, rn, sorrows, convertTime, disp
         w = 'null';
     }
     
-    if(checkWord(sorrows, w) == false) {
+    if(checkWord(serverSorrows, w) == false) {
         return message.channel.send(`\`${w}\` is not a valid word. Use the command \`dictionary\` for a complete list of words.`)
     } else {
-        let sw = singleWord(sorrows, w);
+        let sw = singleWord(serverSorrows, w);
         w = w.toLowerCase();
         
         message.channel.send({
             "embed": {
                 color: 0x23BDE7,
                 title: `${w} - ${sw.speech}`,
-                description: `\`\`\`${sw.desc}\`\`\``,
+                description: `\`\`\`${sw.definition}\`\`\``,
                 footer: {
-                    icon_url: sw.authorPic,
+                    icon_url: sw.authorPicture,
                     text: sw.author
                 }
             }

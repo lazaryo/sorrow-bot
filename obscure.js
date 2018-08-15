@@ -25,13 +25,12 @@ const newGuildHook = new Discord.WebhookClient(hooks.newGuild.id, hooks.newGuild
 const blacklistHook = new Discord.WebhookClient(hooks.blacklist.id, hooks.blacklist.token);
 const botLogHook = new Discord.WebhookClient(hooks.botLog.id, hooks.botLog.token);
 
-const sorrows = require('./words.json');
 const banned = require('./banned.json');
 const safe = require('./safe.json');
 const about = config.about;
 const prefix = config.prefix;
-let serverSorrows = '';
-let newOne = [];
+let dictionary = '';
+let serverSorrows = [];
 
 var http = require('http');
 
@@ -45,7 +44,7 @@ var request = http.request(options, function (res) {
         data += chunk;
     });
     res.on('end', function () {
-        serverSorrows = data;
+        dictionary = data;
     });
 });
 request.on('error', function (e) {
@@ -62,9 +61,9 @@ bot.on('ready', () => {
 
 // response when messages are sent in a channel
 bot.on("message", (message) => {
-    var lexicon = JSON.parse(serverSorrows);
+    var lexicon = JSON.parse(dictionary);
     for (var word in lexicon) {
-        newOne.push(lexicon[word]);
+        serverSorrows.push(lexicon[word]);
     }
     
     const messagePrefix = message.content.split(" ")[0];
@@ -76,13 +75,13 @@ bot.on("message", (message) => {
     if (message.channel.type !== 'text') return;
     
     let command = message.content.split(" ")[1];
-    var rn = Math.floor(Math.random() * (sorrows.length - 1));
+    var rn = Math.floor(Math.random() * (serverSorrows.length - 1));
     let args = message.content.split(" ").slice(2);
     var path = './commands/';
     
     try {
         let commandFile = require(`${path}${command}.js`);
-        commandFile.run(bot, message, args, newOne, about, rn, sorrows, convertTime, displayWords, checkWord, singleWord, prefix, botUptime, banned, checkID, fs, newGuildHook, blacklistHook, safe);
+        commandFile.run(bot, message, args, serverSorrows, about, rn, convertTime, displayWords, checkWord, singleWord, prefix, botUptime, banned, checkID, fs, newGuildHook, blacklistHook, safe);
     } catch (err) {
         console.error(err);
         console.log(cRed(`From Guild: ${message.guild.name}`));

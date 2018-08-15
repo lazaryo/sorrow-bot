@@ -1,4 +1,4 @@
-exports.run = (bot, message, args, about, rn, sorrows, convertTime, displayWords, checkWord, singleWord, prefix, botUptime, banned, checkID, fs, newGuildHook, blacklistHook, safe) => {
+exports.run = (bot, message, args, serverSorrows, about, rn, convertTime, displayWords, checkWord, singleWord, prefix, botUptime, banned, checkID, fs, newGuildHook, blacklistHook, safe) => {
     const currentGuild = message.guild;
     const currentGuildID = message.guild.id;
     const messageCount = message.content.split(` `).length;
@@ -13,22 +13,3 @@ exports.run = (bot, message, args, about, rn, sorrows, convertTime, displayWords
     
     message.channel.send('I have retired this command for now.');
 }
-        
-//    if (messageCount != 3) {
-//        return message.channel.send('Brother man, you need to add a Guild ID for blacklisting.');
-//    } else {
-//        serverID.shift();
-//        serverID.shift();
-//        serverID = serverID[0];
-//
-//        if (safe.whitelist.includes(serverID)) {
-//            return message.channel.send('This server has already been saved.');
-//        }
-//        
-//        safe.whitelist.push(serverID);
-//        fs.writeFile("./safe.json", JSON.stringify(safe, "", "\t"), err => {
-//            bot.users.get("266000833676705792").send("**Guild Whitelisted:** " + serverID + "\n" + (err ? "Failed to update database" : "Database updated."));
-//            return message.channel.send('This server has been added to the whitelist.');
-//        })
-//    }
-//}

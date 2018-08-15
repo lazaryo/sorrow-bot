@@ -1,17 +1,17 @@
-exports.run = (bot, message, args, newOne, about, rn, sorrows) => {
+exports.run = (bot, message, args, serverSorrows, about, rn) => {
     message.channel.send({
             "embed": {
             color: 0x23BDE7,
-            title: `${newOne[rn].title} - ${newOne[rn].speech}`,
-            description: `\`\`\`${newOne[rn].definition}\`\`\``,
+            title: `${serverSorrows[rn].title} - ${serverSorrows[rn].speech}`,
+            description: `\`\`\`${serverSorrows[rn].definition}\`\`\``,
             footer: {
-                icon_url: sorrows[rn].authorPic,
-                text: sorrows[rn].author
+                icon_url: serverSorrows[rn].authorPic,
+                text: serverSorrows[rn].author
             }
         }
     });
     
-    if (newOne[rn].video != null) {
-        message.channel.send(newOne[rn].video);
+    if (serverSorrows[rn].video != null) {
+        message.channel.send(serverSorrows[rn].video);
     }
 }
