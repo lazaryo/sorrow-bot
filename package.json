@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "Obscure Sorrow Bot: A Discord Bot",
   "dependencies": {
-    "chalk": "^2.0.1",
-    "discord.js": "11.1.0",
+    "chalk": "^2.4.1",
+    "discord.js": "^11.4.2",
     "forever": "^0.15.3",
     "jsonfile": "^2.4.0"
   },

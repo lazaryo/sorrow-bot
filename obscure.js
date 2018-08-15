@@ -30,6 +30,28 @@ const banned = require('./banned.json');
 const safe = require('./safe.json');
 const about = config.about;
 const prefix = config.prefix;
+let serverSorrows = '';
+let newOne = [];
+
+var http = require('http');
+
+var options = {
+    host: 'malikdh.com',
+    path: '/obscure-sorrows/api/dictionary'
+}
+var request = http.request(options, function (res) {
+    var data = '';
+    res.on('data', function (chunk) {
+        data += chunk;
+    });
+    res.on('end', function () {
+        serverSorrows = data;
+    });
+});
+request.on('error', function (e) {
+    console.log(e.message);
+});
+request.end();
 
 // use require() for future references
 // just how the commands are set up
@@ -40,6 +62,11 @@ bot.on('ready', () => {
 
 // response when messages are sent in a channel
 bot.on("message", (message) => {
+    var lexicon = JSON.parse(serverSorrows);
+    for (var word in lexicon) {
+        newOne.push(lexicon[word]);
+    }
+    
     const messagePrefix = message.content.split(" ")[0];
     if (message.author.id == about.ownerID) return;
     if (message.author.bot) return;
@@ -55,7 +82,7 @@ bot.on("message", (message) => {
     
     try {
         let commandFile = require(`${path}${command}.js`);
-        commandFile.run(bot, message, args, about, rn, sorrows, convertTime, displayWords, checkWord, singleWord, prefix, botUptime, banned, checkID, fs, newGuildHook, blacklistHook, safe);
+        commandFile.run(bot, message, args, newOne, about, rn, sorrows, convertTime, displayWords, checkWord, singleWord, prefix, botUptime, banned, checkID, fs, newGuildHook, blacklistHook, safe);
     } catch (err) {
         console.error(err);
         console.log(cRed(`From Guild: ${message.guild.name}`));
