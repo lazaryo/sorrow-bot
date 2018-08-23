@@ -4,6 +4,21 @@ const fs = require('fs');
 const Discord = require("discord.js");
 const bot = new Discord.Client();
 const config = require('./config.json');
+
+// Initialize **or load** the server configurations
+const Enmap = require('enmap');
+const Provider = require('enmap-sqlite');
+// I attach settings to client to avoid confusion especially when moving to a modular bot.
+bot.settings = new Enmap({provider: new Provider({name: "settings"})});
+// Just setting up a default configuration object here, to have somethign to insert.
+const defaultSettings = {
+    prefix: '<@!299851881746923520>',
+    modLogChannel: "mod-log",
+    modRole: "Moderator",
+    adminRole: "Administrator"
+}
+
+// Colorful Console Logging
 const chalk = require('chalk');
 var clk = new chalk.constructor({enabled: true});
 
@@ -28,7 +43,6 @@ const botLogHook = new Discord.WebhookClient(hooks.botLog.id, hooks.botLog.token
 const banned = require('./banned.json');
 const safe = require('./safe.json');
 const about = config.about;
-const prefix = config.prefix;
 let dictionary = '';
 let serverSorrows = [];
 
@@ -52,36 +66,54 @@ request.on('error', function (e) {
 });
 request.end();
 
-// use require() for future references
-// just how the commands are set up
 bot.on('ready', () => {
+    bot.guilds.forEach(guild => {
+        if(!bot.settings.has(guild.id)) {
+           bot.settings.set(guild.id, defaultSettings);
+        }
+    });
+    
     checkBlacklist(bot, blacklistHook);
     console.log(cBlue(`Ready to serve in ${bot.channels.size} channels on ${bot.guilds.size} servers, for a total of ${bot.users.size} users.`));
 });
 
 // response when messages are sent in a channel
-bot.on("message", (message) => {
+bot.on("message", async (message) => {
     var lexicon = JSON.parse(dictionary);
     for (var word in lexicon) {
         serverSorrows.push(lexicon[word]);
     }
     
     const messagePrefix = message.content.split(" ")[0];
+    
+    // Let's load the config. If it doesn't exist, use the default settings.
+    // This is an extra security measure, in case enmap fails (it won't. better safe than sorry!)
+    const guildConf = bot.settings.get(message.guild.id) || defaultSettings;
+  
+    // We also stop processing if the message does not start with our prefix.
+    if (messagePrefix !== guildConf.prefix) return;
+
+    if(!message.guild || message.author.bot) return;
     if (message.author.id == about.ownerID) return;
-    if (message.author.bot) return;
         
-    if (!prefix.includes(messagePrefix)) return;
     if (message.channel.type == 'dm') return;
     if (message.channel.type !== 'text') return;
     
+    // Then we use the config prefix to get our arguments and command:
+    // const args = message.content.split(/\s+/g);
+    // const command = args.shift().slice(guildConf.prefix.length).toLowerCase();
+    
     let command = message.content.split(" ")[1];
-    var rn = Math.floor(Math.random() * (serverSorrows.length - 1));
     let args = message.content.split(" ").slice(2);
+    // console.log("args: " + args);
+    // console.log("command: " + command);
+
+    var rn = Math.floor(Math.random() * (serverSorrows.length - 1));
     var path = './commands/';
     
     try {
         let commandFile = require(`${path}${command}.js`);
-        commandFile.run(bot, message, args, serverSorrows, about, rn, convertTime, displayWords, checkWord, singleWord, prefix, botUptime, banned, checkID, fs, newGuildHook, blacklistHook, safe);
+        commandFile.run(bot, message, args, serverSorrows, about, guildConf, rn, convertTime, displayWords, checkWord, singleWord, botUptime, banned, checkID, fs, newGuildHook, blacklistHook, safe);
     } catch (err) {
         console.error(err);
         console.log(cRed(`From Guild: ${message.guild.name}`));
@@ -94,6 +126,9 @@ bot.on("message", (message) => {
 
 // When the bot joins a new server
 bot.on("guildCreate", server => {
+    // Initialize Default Settings for a new guild
+    bot.settings.set(server.id, defaultSettings);
+    
     let criticalInfo = {
         "name": server.name,
         "id": server.id,
@@ -114,26 +149,15 @@ bot.on("guildCreate", server => {
             fs.writeFile("./banned.json", JSON.stringify(banned, "", "\t"), err => {
                 bot.users.get("266000833676705792").send("**Bot Farm blacklisted:** " + criticalInfo.name + " (" + criticalInfo.id + ")\n" + (err ? "Failed to update database" : "Database updated."))
             }) 
-            server.defaultChannel.send("Of all the different ways we reassure ourselves, the least comforting is this: \"It's already too late.\"");
             return server.leave();
         }
     }
     
     newServer(server, newGuildHook, criticalInfo);
-    
-    // Welcome message with a list of commands will be sent to the default channel when joining the guild
-    server.defaultChannel.send('Thanks for adding me. Below are the commands that you can use with me.');
-    server.defaultChannel.send({
-        "embed": {
-            color: 0x23BDE7,
-            title: 'My Commands',
-            description: '`sorrow`, `word`, `dictionary`, `info`, `help`',
-            fields: [{
-                name: 'Prefix',
-                value: `${bot.user}`
-            }]
-        }
-    }).catch(error => console.log(error));
+});
+
+bot.on("guildDelete", guild => {
+    bot.settings.delete(guild.id);
 });
 
 // Error stuff
@@ -212,7 +236,6 @@ function checkBlacklist(bot, hook) {
         ownerID = guild.ownerID;
         
         if (banned.blacklist.includes(serverID)) {
-            //guild.defaultChannel.send("Of all the different ways we reassure ourselves, the least comforting is this: \"It's already too late.\"");
             guild.leave();
             return hook.send(`Removed Guild: ${serverName}!`).then(message => console.log(cDebug(`Sent message:\n${message.content}`))).catch(console.error);
         }

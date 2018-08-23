@@ -13,6 +13,9 @@ safe.json
 #help.txt
 help.txt
 
+# ignore sql-lite data
+data
+
 # Logs
 logs
 *.log
