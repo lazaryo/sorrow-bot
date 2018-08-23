@@ -1,4 +1,4 @@
-exports.run = (bot, message, args, serverSorrows, about, guildConf, rn) => {
+exports.run = (bot, message, args, serverSorrows, about, guildConf) => {
     const adminRole = message.guild.roles.find("name", guildConf.adminRole);
     if(!adminRole) return message.reply("Administrator Role Not Found");
     

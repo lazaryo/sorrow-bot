@@ -113,7 +113,7 @@ bot.on("message", async (message) => {
     
     try {
         let commandFile = require(`${path}${command}.js`);
-        commandFile.run(bot, message, args, serverSorrows, about, guildConf, rn, convertTime, displayWords, checkWord, singleWord, botUptime, banned, checkID, fs, newGuildHook, blacklistHook, safe);
+        commandFile.run(bot, message, args, serverSorrows, about, guildConf, rn, botUptime, banned, safe, checkID, checkWord, convertTime, displayWords, singleWord);
     } catch (err) {
         console.error(err);
         console.log(cRed(`From Guild: ${message.guild.name}`));

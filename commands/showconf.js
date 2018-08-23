@@ -1,4 +1,4 @@
-exports.run = (bot, message, args, serverSorrows, about, guildConf, rn) => {
+exports.run = (bot, message, args, serverSorrows, about, guildConf) => {
     let configKeys = "";
     
     Object.keys(guildConf).forEach(key => {

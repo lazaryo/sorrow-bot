@@ -1,4 +1,4 @@
-exports.run = (bot, message, args, serverSorrows, about, rn, convertTime, displayWords, checkWord, singleWord, prefix, botUptime) => {
+exports.run = (bot, message, args, serverSorrows, about, guildConf, rn, botUptime) => {    
     message.channel.send({
         "embed": {
             color: 0x23BDE7,

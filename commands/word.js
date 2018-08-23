@@ -1,4 +1,4 @@
-exports.run = (bot, message, args, serverSorrows, about, rn, convertTime, displayWords, checkWord, singleWord, prefix) => {
+exports.run = (bot, message, args, serverSorrows, about, guildConf, rn, botUptime, banned, safe, checkID, checkWord, convertTime, displayWords, singleWord) => {
     const wordCount = message.content.split(` `).length;
     let words = message.content.split(` `);
     var w = '';

@@ -1,4 +1,4 @@
-exports.run = (bot, message, args, serverSorrows, about) => {
+exports.run = (bot, message, args) => {
     if (message.author.id !== "303105492572569600") {
         return message.channel.send('You don\'t have permission you :chicken:!');
     }

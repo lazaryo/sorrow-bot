@@ -1,4 +1,4 @@
-exports.run = (bot, message) => {
+exports.run = (bot, message, args, serverSorrows, about, guildConf) => {
     message.channel.send({
         "embed": {
             color: 0x23BDE7,
@@ -6,7 +6,7 @@ exports.run = (bot, message) => {
             description: '`sorrow`, `word`, `dictionary`, `info`, `help`',
             fields: [{
                 name: 'Prefix',
-                value: `${bot.user}`
+                value: guildConf.prefix
             }],
             footer: {
                 icon_url: bot.user.avatarURL,

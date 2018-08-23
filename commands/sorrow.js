@@ -1,4 +1,4 @@
-exports.run = (bot, message, args, serverSorrows, about, rn) => {
+exports.run = (bot, message, args, serverSorrows, about, guildConf, rn) => {
     message.channel.send({
             "embed": {
             color: 0x23BDE7,
@@ -11,7 +11,7 @@ exports.run = (bot, message, args, serverSorrows, about, rn) => {
         }
     });
     
-    if (serverSorrows[rn].video != null) {
+    if (serverSorrows[rn].video) {
         message.channel.send(serverSorrows[rn].video);
     }
 }

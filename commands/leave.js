@@ -1,4 +1,4 @@
-exports.run = (bot, message, args, serverSorrows, about, rn, convertTime, displayWords, checkWord, singleWord, prefix, botUptime, banned, checkID, fs, newGuildHook, blacklistHook, safe) => {
+exports.run = (bot, message) => {
     const currentGuild = message.guild;
     const currentGuildID = message.guild.id;
     const messageCount = message.content.split(` `).length;
